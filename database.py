@@ -21,5 +21,3 @@ class Database(object):
     )
 
     self.cursor = self.connection.cursor()
-
-    return True
