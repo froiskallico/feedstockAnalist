@@ -22,6 +22,8 @@ class Analisador(object):
         self.db.connection
       )
 
+      
+
     self.get_op_feedstock()
 
   def get_op_feedstock(self):
@@ -36,4 +38,3 @@ class Analisador(object):
 
 
     
-Analisador(testMode=True, csvMode=True)
