@@ -6,7 +6,6 @@ import pandas as pd
 class Analisador(object):
   def __init__(self, testMode=False, csvMode=False):
     if testMode:
-      pprint("Oi")
       self.db = Database(testMode=testMode)
       self.get_op_dataset(csvMode=csvMode)
     else:
@@ -23,12 +22,13 @@ class Analisador(object):
         self.db.connection
       )
 
-    pprint(self.dataset)
-
     self.get_op_feedstock()
 
   def get_op_feedstock(self):
-    pprint(self.dataset["CPD"])
+    self.pds = self.dataset.iloc[:,1].to_list()
+
+
+    pprint("SELECT RAZAO_SOCIAL FROM PRODUTOS WHERE PK_PRO IN {}".format(str(self.pds).replace('[', '(').replace(']', ')')))
 
 
     # dataset.to_csv('./test114486.csv', sep=';')
