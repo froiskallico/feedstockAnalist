@@ -9,7 +9,7 @@
 Sistema que faça a análise de necessidades de matérias primas em uma ou mais ordens de produção indicadas pelo usuário, de modo a sinalizar eventuais rupturas no fluxo de abastecimento e indicar ações a serem tomadas.
 
 - Os usuários poderão indicar uma ou mais ordens de produção;
-- O sistema usará os parâmetros atuais já existentes do MRP do Sistema para seus cálculos;
+- O sistema usará os parâmetros atuais já existentes do MRP para cálculo do estoque máximo;
 - Análise de OPs *vs.* OCs pendentes **na linha do tempo**, devolvendo uma análise de:
   - **Qual(is) item(ns)** irá(ão) faltar;
   - **Quando** ocorrerá a falta;
@@ -25,12 +25,11 @@ Sistema que faça a análise de necessidades de matérias primas em uma ou mais 
 - As análises ficarão registradas em banco de dados, com os dados do momento em que foram feitas (Foto da análise);
 - Exportação da análise para excel;
 - Exportação das sugestões de compras para posterior importação no Delphus;
-- No sistema existirá a opção de rodas a mesma análise para os itens do Radar de Compras.
+- No sistema existirá a opção de rodar a mesma análise para os itens do Radar de Compras.
 
 
 ## Características:
 - Aplicação em Browser, acessível de qualquer local com internet;
-- Login criptografado via email e senha;
 - Interface com banco de dados do Delphus com consulta em tempo real.
 
 ## Investimento Líquido

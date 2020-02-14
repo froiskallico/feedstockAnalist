@@ -10,9 +10,9 @@ class Analisador(object):
       self.get_op_dataset(csvMode=csvMode)
     else:
       op = input("Digite nr da OP para Análise: ")
-      get_op_dataset(op_number=op)
+      self.get_op_dataset(op_number=op)
 
-  
+
   def get_op_dataset(self, op_number=None, testMode=False, csvMode=False):
     if csvMode:
       self.dataset = pd.read_csv('./test114486.csv', sep=';')
@@ -22,7 +22,7 @@ class Analisador(object):
         self.db.connection
       )
 
-      
+
 
     self.get_op_feedstock()
 
@@ -37,4 +37,4 @@ class Analisador(object):
 
 
 
-    
+
