@@ -23,7 +23,7 @@
     <body class="vscode-light">
         <h1 id="aplica%c3%a7%c3%a3o-para-an%c3%a1lise-de-mat%c3%a9rias-primas-em-ordens-de-produ%c3%a7%c3%a3o">Aplicação para análise de Matérias Primas em Ordens de Produção</h1>
 <p><strong>Cliente:</strong> Datateck Indústria e Comércio LTDA</p>
-<p><strong>Data:</strong> 11/02/2020
+<p><strong>Data:</strong> 14/02/2020
 </br>
 </br></p>
 <h2 id="escopo">Escopo:</h2>
@@ -38,13 +38,24 @@
 <li><strong>Para qual(is) OP(s) ocorrerá</strong> a falta;</li>
 <li><strong>Para qual(is) cliente(s)</strong> ocorreá a falta;</li>
 <li><strong>De quanto</strong> será a falta;</li>
-<li><strong>Ação sugerida</strong> (Antecipar OC, Colocar OC);</li>
+<li><strong>Ação sugerida</strong> (Antecipar OC, Colocar OC):
+<ul>
 <li>Se a sugestão for antecipar =&gt; <strong>Qual OC antecipar</strong>;</li>
-<li>Se a sugestão for comprar =&gt; <strong>Quanto comprar</strong>;</li>
-<li><strong>Alerta</strong> de Lead Time (<em>Se a necessidade for para um prazo menor que o Lead Time, indicando necessidade de ação emergencial</em>)</li>
+<li>Se a sugestão for comprar =&gt; <strong>Quanto comprar (<em>buscando respeitar o estoque máximo MRP</em>)</strong>:
+<ul>
+<li>Alertar o usuário se a sugestão ultrapassar o estoque máximo.</li>
 </ul>
 </li>
-<li>As análises ficarão registradas em banco de dados, com os dados do momento em que foram feitas (Foto da análise).</li>
+</ul>
+</li>
+<li><strong>Alerta</strong> de Lead Time (<em>Se a necessidade for para um prazo menor que o Lead Time, indicando necessidade de ação emergencial</em>).</li>
+</ul>
+</li>
+<li>Calcular o valor financeiro das compras sugeridas, por item e total da análise;</li>
+<li>As análises ficarão registradas em banco de dados, com os dados do momento em que foram feitas (Foto da análise);</li>
+<li>Exportação da análise para excel;</li>
+<li>Exportação das sugestões de compras para posterior importação no Delphus;</li>
+<li>No sistema existirá a opção de rodas a mesma análise para os itens do Radar de Compras.</li>
 </ul>
 <h2 id="caracter%c3%adsticas">Características:</h2>
 <ul>
@@ -55,22 +66,25 @@
 <h2 id="investimento-l%c3%adquido">Investimento Líquido</h2>
 <ul>
 <li>
-<h3 id="r-364000-tr%c3%aas-mil-seiscentos-e-quarenta-reais">R$ 3.640,00 (Três mil seiscentos e quarenta reais)</h3>
+<h3 id="r-300000-tr%c3%aas-mil-reais">R$ 3.000,00 (Três mil reais)</h3>
 </li>
 </ul>
 <p><em>Ficará a cargo da Datateck fornecer VPS com acesso remoto para testes, hospedagem do servidor e banco de dados da aplicação ou, se preferir, contratação de serviço de hospedagem cloud (AWS, GCP, Azuew, etc)</em></p>
 <h2 id="forma-de-pagamento">Forma de pagamento</h2>
 <ul>
 <li>
-<h3 id="50-no-deploy-completo-da-aplica%c3%a7%c3%a3o-conforme-escopo">50% no deploy completo da aplicação conforme escopo;</h3>
+<h3 id="34-no-deploy-completo-da-aplica%c3%a7%c3%a3o-conforme-escopo">34% no deploy completo da aplicação conforme escopo;</h3>
 </li>
 <li>
-<h3 id="50-30dd-ap%c3%b3s-deploy">50% 30dd após deploy.</h3>
+<h3 id="33-28dd-ap%c3%b3s-deploy">33% 28dd após deploy;</h3>
+</li>
+<li>
+<h3 id="33-56dd-ap%c3%b3s-deploy">33% 56dd após deploy.</h3>
 </li>
 </ul>
 <h2 id="entrega">Entrega</h2>
-<h3 id="6-dias-ap%c3%b3s-aprova%c3%a7%c3%a3o-da-proposta">6 dias após aprovação da proposta</h3>
-<p><em>Neste período poderão ocorrer entregas parciais, para validação e testes da aplicação.</em></p>
+<h3 id="entrega-total-at%c3%a9-26022020">Entrega total até 26/02/2020</h3>
+<p><em>Neste período ocorrerão entregas parciais, para validação e testes da aplicação.</em></p>
 <h2 id="validade-da-proposta">Validade da Proposta</h2>
 <h3 id="30-dias">30 dias</h3>
 <br>
