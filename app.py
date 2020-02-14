@@ -148,7 +148,7 @@ class App(object):
 
     def get_ops_pendentes(self):
         self.ops_pendentes = pd.read_sql(
-            # Todo: HERE in the SQL Query take the last day of "Semana" where ise_geral.entrega and ipe.entrega is null
+            # TODO: HERE in the SQL Query take the last day of "Semana" where ise_geral.entrega and ipe.entrega is null
             """
                 SELECT DISTINCT
                     FIC_GERAL.FK_PRO CPD_MP,
@@ -202,6 +202,11 @@ class App(object):
         # self.timeline = pd.merge(self.datas, self.ocs_pendentes[self.ocs_penentes["CPD_MP"] == 1062]["CPD_MP", "ENTREGA", "QTD_PENDENTE_OC"], on="ENTREGA", how='outer', sort="ENTREGA").merge(self.ops_pendentes[["CPD_MP", "ENTREGA", "COMPROMETIDO"]], 'outer', ["ENTREGA", "CPD_MP"])
         ocs = self.ocs_pendentes[self.ocs_pendentes["CPD_MP"] == 1062][["CPD_MP", "ENTREGA", "QTD_PENDENTE_OC"]]
         ops = self.ops_pendentes[self.ops_pendentes["CPD_MP"] == 1062][["CPD_MP", "ENTREGA", "COMPROMETIDO"]]
+
+        # TODO here merge the OCS_PENDENTES and OPS_PENDENTES dataframe and calculate BALANCE for each day
+        # TODO Make it a "balance calculation function"
+        # TODO run this "balance calculation function" for each "MP em analise"
+
 
         # print(ocs)
         print('-'*120)
