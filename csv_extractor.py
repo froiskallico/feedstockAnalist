@@ -17,14 +17,14 @@ class App(object):
         self.get_ocs_pendentes()
         self.get_ops_pendentes()
 
-        self.ops_em_analise.to_csv('./csv/ops_em_analise.csv')
-        self.chicotes_em_analise.to_csv('./csv/chicotes_em_analise.csv')
-        self.mp_em_analise.to_csv('./csv/mp_em_analise.csv')
-        self.fic_tec.to_csv('./csv/fic_tec.csv')
-        self.ocs_pendentes.to_csv('./csv/ocs_pendentes.csv')
+        # self.ops_em_analise.to_csv('./csv/ops_em_analise.csv')
+        # self.chicotes_em_analise.to_csv('./csv/chicotes_em_analise.csv')
+        # self.mp_em_analise.to_csv('./csv/mp_em_analise.csv')
+        # self.fic_tec.to_csv('./csv/fic_tec.csv')
+        # self.ocs_pendentes.to_csv('./csv/ocs_pendentes.csv')
         self.ops_pendentes.to_csv('./csv/ops_pendentes.csv')
 
-        self.what_the_print()
+        # self.what_the_print()
     def get_op(self):
         # Define o numero da(s) OPS(s) a ser(em) analisada(s)
         self.lista_ops = str((114562))
@@ -195,7 +195,7 @@ class App(object):
                     FIC_GERAL.FK_PROACAB CPD_CHICOTE,
                     CHICOTE.COD_FABRIC CODIGO_CHICOTE,
                     COALESCE(ISE_GERAL.ENTREGA, IPE.ENTREGA) ENTREGA,
-                    ISE_GERAL.SEMANA SEMANA_ENTREGA,
+                    COALESCE(ISE_GERAL.SEMANA, IPE.SEM_ENTREG) SEMANA_ENTREGA,
                     ISE_GERAL.FK_OSE OP,
                     CAD.RAZAO_SOCIAL CLIENTE,
                     (ISE_GERAL.QUANTIDADE - COALESCE(ISE_GERAL.QTD_CANC, 0) - COALESCE(ISE_GERAL.QTD_PROD, 0)) * FIC_GERAL.QUANTIDADE COMPROMETIDO

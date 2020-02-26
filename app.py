@@ -224,6 +224,7 @@ class App(object):
 
         self.ocs_pendentes = csv() if self.csv else sql()
 
+        # Normliza as datas para formato DateTime
         self.ocs_pendentes["ENTREGA"] = pd.to_datetime(self.ocs_pendentes["ENTREGA"])
 
     def get_ops_pendentes(self):
@@ -237,6 +238,7 @@ class App(object):
                     FIC_GERAL.FK_PROACAB CPD_CHICOTE,
                     CHICOTE.COD_FABRIC CODIGO_CHICOTE,
                     COALESCE(ISE_GERAL.ENTREGA, IPE.ENTREGA) ENTREGA,
+                    COALESCE(ISE_GERAL.SEMANA, IPE.SEM_ENTREG) SEMANA_ENTREGA,
                     ISE_GERAL.FK_OSE OP,
                     CAD.RAZAO_SOCIAL CLIENTE,
                     (ISE_GERAL.QUANTIDADE - COALESCE(ISE_GERAL.QTD_CANC, 0) - COALESCE(ISE_GERAL.QTD_PROD, 0)) * FIC_GERAL.QUANTIDADE COMPROMETIDO
@@ -263,10 +265,13 @@ class App(object):
 
         self.ops_pendentes = csv() if self.csv else sql()
 
+        # Normliza as datas para formato DateTime
         self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"])
 
         # TODO: Here, populate the "ENTREGA" with the "SEMANA" friday where "ENTREGA" is NaN
         # self.ops_pendetes["SEXTA_SEMANA"] = datetime.date(2020, 1, 1) + (self.ops_pendentes["SEMANA_ENTREGA"]  * 7)
+
+        # print(self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna()]["SEMANA_ENTREGA"])
         # self.ops_pendentes = self.ops_pendentes.fill
 
     def what_the_print(self):
@@ -350,9 +355,6 @@ class App(object):
         pri_data_falta = self.datas_falta["ENTREGA"].min()
 
         self.ops_falta = self.ops_pendentes[self.ops_pendentes["CPD_MP"]==800].set_index("ENTREGA")[:pri_data_falta]
-
-        print(self.ops_falta)
-
 
         # TODO: Get a subset from self.ops_pendentes filtering where "ENTREGA" in self.datas_falta and store it to self.ops_falta
         # TODO: Save self.ops_falta to HTML with to_html() method.
