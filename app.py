@@ -224,6 +224,8 @@ class App(object):
 
         self.ocs_pendentes = csv() if self.csv else sql()
 
+        self.ocs_pendentes["ENTREGA"] = pd.to_datetime(self.ocs_pendentes["ENTREGA"])
+
     def get_ops_pendentes(self):
         # Obtem as ordens de produção pendentes para as MPs vinculadas à analise
         def sql():
@@ -260,6 +262,8 @@ class App(object):
             return pd.read_csv(self.path_csv + 'ops_pendentes.csv')
 
         self.ops_pendentes = csv() if self.csv else sql()
+
+        self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"])
 
         # TODO: Here, populate the "ENTREGA" with the "SEMANA" friday where "ENTREGA" is NaN
         # self.ops_pendetes["SEXTA_SEMANA"] = datetime.date(2020, 1, 1) + (self.ops_pendentes["SEMANA_ENTREGA"]  * 7)
@@ -310,10 +314,6 @@ class App(object):
         ops = self.ops_pendentes[self.ops_pendentes["CPD_MP"] == CPD_MP][[
             "CPD_MP", "ENTREGA", "COMPROMETIDO"]].groupby(["CPD_MP", "ENTREGA"]).sum().reset_index()
 
-        # Normaliza as datas de entrega das OCs e das OPs pendentes
-        ocs["ENTREGA"] = pd.to_datetime(ocs["ENTREGA"])
-        ops["ENTREGA"] = pd.to_datetime(ops["ENTREGA"])
-
         # Define um array com os DataFrames que serão mesclados
         dfs_to_merge = [self.datas, ocs, ops]
 
@@ -329,6 +329,10 @@ class App(object):
         self.tl["SALDO_FINAL"] = 0
 
         # Define o saldo inicial da primeira data no self.tl
+        self.tl.loc[0, "SALDO_INICIAL"] = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"] == CPD_MP, "SALDO_INICIAL"].to_numpy()
+
+
+        # Define o saldo final da primeira data no self.tl
         self.tl.loc[0, "SALDO_FINAL"] = self.tl.loc[0, "SALDO_INICIAL"] - self.tl.loc[0, "COMPROMETIDO"] + self.tl.loc[0, "QTD_PENDENTE_OC"]
 
         # Calcula os saldos final e inicial para as demais linhas no self.tl
@@ -339,10 +343,23 @@ class App(object):
         # Cria a coluna que indica SE e QUANDO ira faltar MP na self.tl
         self.tl["FALTA"] = self.tl["SALDO_FINAL"] <= 0
 
-        # TODO: From self.tl fetch all "ENTREGA" where FALTA == True and store the dates in a Series or array self.datas_falta
+        # Define as datas em que haverá falta de MP
+        self.datas_falta = self.tl[self.tl["FALTA"]][["ENTREGA", "CPD_MP"]]
+
+        # self.ops_falta =  ops.loc[ops["ENTREGA"] >= self.datas_falta["ENTREGA"].min()]
+        pri_data_falta = self.datas_falta["ENTREGA"].min()
+
+        self.ops_falta = self.ops_pendentes[self.ops_pendentes["CPD_MP"]==800].set_index("ENTREGA")[:pri_data_falta]
+
+        print(self.ops_falta)
+
+
         # TODO: Get a subset from self.ops_pendentes filtering where "ENTREGA" in self.datas_falta and store it to self.ops_falta
         # TODO: Save self.ops_falta to HTML with to_html() method.
 
         # TODO: Execute the timeline method to all self.mp_em_analise itens
 
 a = App(csv=True)
+
+
+# %%
