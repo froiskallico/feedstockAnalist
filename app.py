@@ -279,12 +279,6 @@ class App(object):
 
         self.ops_pendentes["ENTREGA"] = self.ops_pendentes["ENTREGA"].fillna(self.ops_sem_data_com_semana)
 
-
-
-
-
-
-
     def what_the_print(self):
         # print("OPS")
         # pprint(self.ops_em_analise)
@@ -335,10 +329,12 @@ class App(object):
 
         # Mescla os DataFrames instanciando a timeline do item no objeto self.tl
         self.tl = reduce(lambda left, right: pd.merge(
-            left, right, how="left", sort="ENTREGA").fillna({ "CPD_MP": CPD_MP }), dfs_to_merge)
+            left, right, how="outer", sort="ENTREGA").fillna({ "CPD_MP": CPD_MP }), dfs_to_merge)
+
 
         # Normaliza as quantidades pendentes para ZERO onde forem NaN
-        self.tl = self.tl.fillna({ "QTD_PENDENTE_OC": 0, "COMPROMETIDO": 0 })
+        self.tl = self.tl.fillna({ "QTD_PENDENTE_OC": 0, "COMPROMETIDO": 0 }).sort_values(by="ENTREGA", ascending=True)
+
 
         # Insere coluna no DataFrame self.tl
         self.tl["SALDO_INICIAL"] = 0
@@ -347,12 +343,11 @@ class App(object):
         # Define o saldo inicial da primeira data no self.tl
         self.tl.loc[0, "SALDO_INICIAL"] = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"] == CPD_MP, "SALDO_INICIAL"].to_numpy()
 
-
         # Define o saldo final da primeira data no self.tl
         self.tl.loc[0, "SALDO_FINAL"] = self.tl.loc[0, "SALDO_INICIAL"] - self.tl.loc[0, "COMPROMETIDO"] + self.tl.loc[0, "QTD_PENDENTE_OC"]
 
         # Calcula os saldos final e inicial para as demais linhas no self.tl
-        for l in range(1, self.tl.size):
+        for l in range(1, len(self.tl)):
             self.tl.loc[l, "SALDO_INICIAL"] = self.tl.loc[l-1, "SALDO_FINAL"]
             self.tl.loc[l, "SALDO_FINAL"] = self.tl.loc[l, "SALDO_INICIAL"] - self.tl.loc[l, "COMPROMETIDO"] + self.tl.loc[l, "QTD_PENDENTE_OC"]
 
@@ -362,13 +357,11 @@ class App(object):
         # Define as datas em que haverá falta de MP
         self.datas_falta = self.tl[self.tl["FALTA"]][["ENTREGA", "CPD_MP"]]
 
-        # self.ops_falta =  ops.loc[ops["ENTREGA"] >= self.datas_falta["ENTREGA"].min()]
+        # Define a primeira data em que haverá falta de MP
         pri_data_falta = self.datas_falta["ENTREGA"].min()
 
-        self.ops_falta = self.ops_pendentes[self.ops_pendentes["CPD_MP"]==800].set_index("ENTREGA")[:pri_data_falta]
-
-        # TODO: Get a subset from self.ops_pendentes filtering where "ENTREGA" in self.datas_falta and store it to self.ops_falta
-        # TODO: Save self.ops_falta to HTML with to_html() method.
+        # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
+        self.ops_falta = self.ops_pendentes[self.ops_pendentes["CPD_MP"]==800].set_index("ENTREGA").sort_values(by="ENTREGA", axis=0, ascending=True)[pri_data_falta:]
 
         # TODO: Execute the timeline method to all self.mp_em_analise itens
 

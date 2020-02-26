@@ -1,4 +1,5 @@
 {
   "python.linting.enabled": true,
-  "python.pythonPath": "C:\\Python37\\python.exe"
+  "python.pythonPath": "C:\\Users\\Kallico\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe",
+  "python.dataScience.jupyterServerURI": "local"
 }
