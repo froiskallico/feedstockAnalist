@@ -271,8 +271,14 @@ class App(object):
         # TODO: Here, populate the "ENTREGA" with the "SEMANA" friday where "ENTREGA" is NaN
         # self.ops_pendetes["SEXTA_SEMANA"] = datetime.date(2020, 1, 1) + (self.ops_pendentes["SEMANA_ENTREGA"]  * 7)
 
-        # print(self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna()]["SEMANA_ENTREGA"])
-        # self.ops_pendentes = self.ops_pendentes.fill
+        self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna()]
+        self.ops_sem_data_com_semana["NSEM"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(0, 2).astype(int)
+        self.ops_sem_data_com_semana["NANO"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(2).astype(int)
+        self.ops_sem_data_com_semana["FDOY"] = pd.to_datetime(dict(year=self.ops_sem_data_com_semana["NANO"], month=1, day=1))
+        self.ops_sem_data_com_semana["FDOYWD"] = self.ops_sem_data_com_semana["FDOY"].dt.weekday
+        self.ops_sem_data_com_semana["ENTREGA_NOVA"] = self.ops_sem_data_com_semana["FDOY"] + pd.to_timedelta(self.ops_sem_data_com_semana["NSEM"] * 7 - 3 - self.ops_sem_data_com_semana["FDOYWD"], 'D')
+        print(self.ops_sem_data_com_semana)
+
 
     def what_the_print(self):
         # print("OPS")
