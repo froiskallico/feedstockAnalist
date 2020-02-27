@@ -4,6 +4,10 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 from functools import reduce
+import json
+from io import StringIO
+
+pd.options.mode.chained_assignment = None
 
 # %%
 class App(object):
@@ -29,7 +33,15 @@ class App(object):
 
         # self.what_the_print()
 
-        self.timeline()
+        self.CPDs = (800, 1062, 907)
+
+        self.faltas = dict()
+
+
+        for cpd in self.CPDs:
+            self.timeline(CPD_MP=cpd)
+
+        self.save_to_json()
 
     def get_op(self):
         # Define o numero da(s) OPS(s) a ser(em) analisada(s)
@@ -261,7 +273,7 @@ class App(object):
             )
 
         def csv():
-            return pd.read_csv(self.path_csv + 'ops_pendentes.csv')
+            return pd.read_csv(self.path_csv + 'ops_pendentes.csv', dtype = { 'SEMANA_ENTREGA': str })
 
         self.ops_pendentes = csv() if self.csv else sql()
 
@@ -271,11 +283,12 @@ class App(object):
         # TODO: COMMENT CODE BELOW
         self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna()]
         self.ops_sem_data_com_semana["NSEM"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(0, 2).astype(int)
-        self.ops_sem_data_com_semana["NANO"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(2).astype(int)
+        self.ops_sem_data_com_semana["NANO"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(2, 6).astype(int)
         self.ops_sem_data_com_semana["FDOY"] = pd.to_datetime(dict(year=self.ops_sem_data_com_semana["NANO"], month=1, day=1))
         self.ops_sem_data_com_semana["FDOYWD"] = self.ops_sem_data_com_semana["FDOY"].dt.weekday
         self.ops_sem_data_com_semana["ENTREGA_NOVA"] = self.ops_sem_data_com_semana["FDOY"] + pd.to_timedelta(self.ops_sem_data_com_semana["NSEM"] * 7 - 3 - self.ops_sem_data_com_semana["FDOYWD"], 'D')
         self.ops_sem_data_com_semana = self.ops_sem_data_com_semana["ENTREGA"].fillna(self.ops_sem_data_com_semana["ENTREGA_NOVA"])
+
 
         self.ops_pendentes["ENTREGA"] = self.ops_pendentes["ENTREGA"].fillna(self.ops_sem_data_com_semana)
 
@@ -300,7 +313,7 @@ class App(object):
         # pprint('-' * 120)
         pass
 
-    def timeline(self, CPD_MP=800):
+    def timeline(self, CPD_MP):
         # Define o horizonte de programação para o item em análise
         horizonte_programacao = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"]
                                                     == CPD_MP]["HORIZONTE_PROGRAMACAO"].iloc[0] * 7
@@ -335,7 +348,6 @@ class App(object):
         # Normaliza as quantidades pendentes para ZERO onde forem NaN
         self.tl = self.tl.fillna({ "QTD_PENDENTE_OC": 0, "COMPROMETIDO": 0 }).sort_values(by="ENTREGA", ascending=True)
 
-
         # Insere coluna no DataFrame self.tl
         self.tl["SALDO_INICIAL"] = 0
         self.tl["SALDO_FINAL"] = 0
@@ -354,16 +366,38 @@ class App(object):
         # Cria a coluna que indica SE e QUANDO ira faltar MP na self.tl
         self.tl["FALTA"] = self.tl["SALDO_FINAL"] <= 0
 
-        # Define as datas em que haverá falta de MP
-        self.datas_falta = self.tl[self.tl["FALTA"]][["ENTREGA", "CPD_MP"]]
+        # Checa se haverá falta em alguma data na TL
+        havera_falta = len(self.tl[self.tl["FALTA"] == True])
 
-        # Define a primeira data em que haverá falta de MP
-        pri_data_falta = self.datas_falta["ENTREGA"].min()
+        # Se houver falta na TL, verificar as datas e OPs em que havera e registrar no relatorio de faltas
+        if havera_falta:
 
-        # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
-        self.ops_falta = self.ops_pendentes[self.ops_pendentes["CPD_MP"]==800].set_index("ENTREGA").sort_values(by="ENTREGA", axis=0, ascending=True)[pri_data_falta:]
+            # Define as datas em que haverá falta de MP
+            self.datas_falta = self.tl[self.tl["FALTA"]][["ENTREGA", "CPD_MP"]]
 
-        # TODO: Execute the timeline method to all self.mp_em_analise itens
+            # Define a primeira data em que haverá falta de MP
+            pri_data_falta = self.datas_falta["ENTREGA"].min()
+
+            # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
+            self.ops_falta = self.ops_pendentes.loc[self.ops_pendentes["CPD_MP"]==CPD_MP].set_index("ENTREGA").sort_values(by="ENTREGA", axis=0, ascending=True)[pri_data_falta:]
+            dados = dict()
+
+            dados["quantidade_falta"] = self.ops_falta.sum()["COMPROMETIDO"]
+            dados["relatorio"] = self.ops_falta.reset_index().to_dict(orient="records")
+
+
+            self.faltas[CPD_MP] = dados
+
+
+            # TODO: Execute the timeline method to all self.mp_em_analise itens
+
+    def save_to_json(self):
+        def myconverter(o):
+            if isinstance(o, datetime):
+                return o.__str__()
+
+        with open("relatorio.json", "w") as json_file:
+            json.dump(self.faltas, json_file, default=myconverter)
 
 a = App(csv=True)
 

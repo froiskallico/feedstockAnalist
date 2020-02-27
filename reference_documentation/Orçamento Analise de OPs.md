@@ -8,24 +8,24 @@
 ## Escopo:
 Sistema que faça a análise de necessidades de matérias primas em uma ou mais ordens de produção indicadas pelo usuário, de modo a sinalizar eventuais rupturas no fluxo de abastecimento e indicar ações a serem tomadas.
 
-- Os usuários poderão indicar uma ou mais ordens de produção;
-- O sistema usará os parâmetros atuais já existentes do MRP para cálculo do estoque máximo;
-- Análise de OPs *vs.* OCs pendentes **na linha do tempo**, devolvendo uma análise de:
-  - **Qual(is) item(ns)** irá(ão) faltar;
-  - **Quando** ocorrerá a falta;
-  - **Para qual(is) OP(s) ocorrerá** a falta;
-  - **Para qual(is) cliente(s)** ocorreá a falta;
-  - **De quanto** será a falta;
-  - **Ação sugerida** (Antecipar OC, Colocar OC):
-    - Se a sugestão for antecipar => **Qual OC antecipar**;
-    - Se a sugestão for comprar => **Quanto comprar (*buscando respeitar o estoque máximo MRP*)**:
-      - Alertar o usuário se a sugestão ultrapassar o estoque máximo.
-  - **Alerta** de Lead Time (*Se a necessidade for para um prazo menor que o Lead Time, indicando necessidade de ação emergencial*).
-- Calcular o valor financeiro das compras sugeridas, por item e total da análise;
-- As análises ficarão registradas em banco de dados, com os dados do momento em que foram feitas (Foto da análise);
-- Exportação da análise para excel;
-- Exportação das sugestões de compras para posterior importação no Delphus;
-- No sistema existirá a opção de rodar a mesma análise para os itens do Radar de Compras.
+- [x] Os usuários poderão indicar uma ou mais ordens de produção;
+- [ ] Análise de OPs *vs.* OCs pendentes **na linha do tempo**, devolvendo uma análise de:
+  - [x] **Qual(is) item(ns)** irá(ão) faltar;
+  - [x] **Quando** ocorrerá a falta;
+  - [x] **Para qual(is) OP(s) ocorrerá** a falta;
+  - [x] **Para qual(is) cliente(s)** ocorreá a falta;
+  - [x] **De quanto** será a falta;
+  - [ ] **Ação sugerida** (Antecipar OC, Colocar OC):
+    - [ ] Se a sugestão for antecipar => **Qual OC antecipar**;
+    - [ ] Se a sugestão for comprar => **Quanto comprar (*buscando respeitar o estoque máximo MRP*)**:
+      - [ ] O sistema usará os parâmetros atuais já existentes do MRP para cálculo do estoque máximo;
+      - [ ] Alertar o usuário se a sugestão ultrapassar o estoque máximo.
+  - [ ] **Alerta** de Lead Time (*Se a necessidade for para um prazo menor que o Lead Time, indicando necessidade de ação emergencial*).
+- [ ] Calcular o valor financeiro das compras sugeridas, por item e total da análise;
+- [ ] As análises ficarão registradas em banco de dados, com os dados do momento em que foram feitas (Foto da análise);
+- [ ] Exportação da análise para excel;
+- [ ] Exportação das sugestões de compras para posterior importação no Delphus;
+- [ ] No sistema existirá a opção de rodar a mesma análise para os itens do Radar de Compras.
 
 
 ## Características:
