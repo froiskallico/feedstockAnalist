@@ -7,12 +7,18 @@ from functools import reduce
 import json
 from io import StringIO
 
+inicio = datetime.now()
+
 pd.options.mode.chained_assignment = None
 
 # %%
 class App(object):
 
     def __init__(self, csv=False):
+        print("\n\n 🤓 Iniciando análise de Matérias Primas")
+        print("\n\n⏳ Por favor aguarde.")
+        print("\n\n🐹 Estamos colocando os hamsters para correrem!")
+
         self.csv = csv
         self.path_csv = './csv/'
 
@@ -33,10 +39,10 @@ class App(object):
 
         # self.what_the_print()
 
-        self.CPDs = (800, 1062, 907)
+        self.CPDs = self.mp_em_analise["CPD_MP"]
+        # self.CPDs = {5751}
 
         self.faltas = dict()
-
 
         for cpd in self.CPDs:
             self.timeline(CPD_MP=cpd)
@@ -161,6 +167,8 @@ class App(object):
             value={"PERC_ESTOQUE_LP": 50}).replace({'PERC_ESTOQUE_LP': 0}, 50)
         self.mp_em_analise = self.mp_em_analise.fillna(
             value={"PERC_ESTOQUE_CORTE": 50}).replace({'PERC_ESTOQUE_CORTE': 0}, 50)
+        self.mp_em_analise = self.mp_em_analise.fillna(
+            value={"HORIZONTE_PROGRAMACAO": 100}).replace({'HORIZONTE_PROGRAMACAO': 100})
 
         # Aplica os percentuais a considerar em cada estoque (LP/Corte)
         self.mp_em_analise["ESTOQUE_LP_CONSIDERADO"] = self.mp_em_analise["ESTOQUE_LP"] * (
@@ -344,7 +352,6 @@ class App(object):
         self.tl = reduce(lambda left, right: pd.merge(
             left, right, how="outer", sort="ENTREGA").fillna({ "CPD_MP": CPD_MP }), dfs_to_merge)
 
-
         # Normaliza as quantidades pendentes para ZERO onde forem NaN
         self.tl = self.tl.fillna({ "QTD_PENDENTE_OC": 0, "COMPROMETIDO": 0 }).sort_values(by="ENTREGA", ascending=True)
 
@@ -357,6 +364,8 @@ class App(object):
 
         # Define o saldo final da primeira data no self.tl
         self.tl.loc[0, "SALDO_FINAL"] = self.tl.loc[0, "SALDO_INICIAL"] - self.tl.loc[0, "COMPROMETIDO"] + self.tl.loc[0, "QTD_PENDENTE_OC"]
+
+        self.tl = self.tl.set_index("ENTREGA").loc[:self.datas.iloc[-1].values[0]].reset_index()
 
         # Calcula os saldos final e inicial para as demais linhas no self.tl
         for l in range(1, len(self.tl)):
@@ -380,14 +389,14 @@ class App(object):
 
             # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
             self.ops_falta = self.ops_pendentes.loc[self.ops_pendentes["CPD_MP"]==CPD_MP].set_index("ENTREGA").sort_values(by="ENTREGA", axis=0, ascending=True)[pri_data_falta:]
+
+
             dados = dict()
 
             dados["quantidade_falta"] = self.ops_falta.sum()["COMPROMETIDO"]
             dados["relatorio"] = self.ops_falta.reset_index().to_dict(orient="records")
 
-
             self.faltas[CPD_MP] = dados
-
 
             # TODO: Execute the timeline method to all self.mp_em_analise itens
 
@@ -399,7 +408,15 @@ class App(object):
         with open("relatorio.json", "w") as json_file:
             json.dump(self.faltas, json_file, default=myconverter)
 
-a = App(csv=True)
+        final = datetime.now()
+
+        tempo = final - inicio
+
+        print("\n\nForam identificados {} itens com faltas iminentes.".format(str(len(self.faltas))))
+        print("\n\n⏱ Tempo decorrido: {}\n\n".format(str(tempo)))
+        print("*** 😁 FIM 😁 ***")
+
+a = App(csv=False)
 
 
 # %%
