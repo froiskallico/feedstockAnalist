@@ -12,12 +12,16 @@ pd.options.mode.chained_assignment = None
 
 class App(object):
 
-    def __init__(self, csv=False):
+    def __init__(self, csv=False, lista_ops=None):
+        self.csv = csv
+        self.lista_ops = lista_ops
+
+        self.path_csv = './csv/'
+
+    def analist(self):
         print("\n\n 🤓 Iniciando análise de Matérias Primas")
         print("\n\n⏳ Por favor aguarde.")
 
-        self.csv = csv
-        self.path_csv = './csv/'
 
         # Instancia as variávies e data frames para rodar a análise
 
@@ -25,11 +29,13 @@ class App(object):
         if not self.csv:
             from database import Database
             self.db = Database()
-            self.get_op()
+            if not self.lista_ops:
+                self.get_op()
 
         print("\n\n🐹 Estamos colocando os hamsters para correrem! ")
 
-        self.get_ops_em_analise()
+        self.ops_em_analise = self.get_ops_em_analise()
+
         self.get_chicotes_em_analise()
         self.get_mps_em_analise()
         # self.get_fic_tec()
@@ -39,14 +45,14 @@ class App(object):
         # self.what_the_print()
 
         self.CPDs = self.mp_em_analise["CPD_MP"]
-        # self.CPDs = {5751}
+        # self.CPDs = {907}
 
         self.faltas = dict()
 
         for cpd in self.CPDs:
             self.timeline(CPD_MP=cpd)
 
-        self.save_to_json()
+        return self.save_to_json()
 
     def get_op(self):
         # Define o numero da(s) OPS(s) a ser(em) analisada(s)
@@ -338,6 +344,8 @@ class App(object):
         print("\n\n⏱ Tempo decorrido: {}\n\n".format(str(tempo)))
         print("*** 😁 FIM 😁 ***")
 
+        return json.dumps(self.faltas, default=myconverter, indent=2)
+
     def timeline(self, CPD_MP):
         # Define o horizonte de programação para o item em análise
         horizonte_programacao = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"]
@@ -436,6 +444,3 @@ class App(object):
 
     def check_purchases(self, CPD_MP, data_primeira_falta):
         return self.ocs_pendentes[self.ocs_pendentes["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()
-
-
-a = App(csv=False)
