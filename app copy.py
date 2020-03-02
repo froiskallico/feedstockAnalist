@@ -1,3 +1,4 @@
+# %%
 from pprint import pprint
 import numpy as np
 import pandas as pd
@@ -10,6 +11,7 @@ inicio = datetime.now()
 
 pd.options.mode.chained_assignment = None
 
+# %%
 class App(object):
 
     def __init__(self, csv=False):
@@ -43,15 +45,15 @@ class App(object):
 
         self.faltas = dict()
 
-        for cpd in self.CPDs:
-            self.timeline(CPD_MP=cpd)
+        # for cpd in self.CPDs:
+        #     self.timeline(CPD_MP=cpd)
 
-        self.save_to_json()
+        # self.save_to_json()
 
     def get_op(self):
         # Define o numero da(s) OPS(s) a ser(em) analisada(s)
-        self.lista_ops = input("Informe o numero da(s) op(s) para analisar: ")
-        # self.lista_ops = 114562
+        # self.lista_ops = input("Informe o numero da(s) op(s) para analisar: ")
+        self.lista_ops = 114562
 
     def get_ops_em_analise(self):
         # ANALISE
@@ -338,104 +340,118 @@ class App(object):
         print("\n\n⏱ Tempo decorrido: {}\n\n".format(str(tempo)))
         print("*** 😁 FIM 😁 ***")
 
-    def timeline(self, CPD_MP):
-        # Define o horizonte de programação para o item em análise
-        horizonte_programacao = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"]
-                                                    == CPD_MP]["HORIZONTE_PROGRAMACAO"].iloc[0] * 7
-
-        # Cria DataSeries com as todas as datas existentes
-        # entre hoje e o limite do horizonte de programação
-        self.datas = pd.DataFrame(
-            {
-                "ENTREGA":
-                pd.date_range(
-                    pd.datetime.today().strftime('%Y-%m-%d'),
-                    periods=horizonte_programacao
-                )
-            }
-        )
-
-        # Busca as OCs somente do CPD em analise e soma as quantidades pendentes das ocs agrupando por data.
-        ocs = self.ocs_pendentes.loc[self.ocs_pendentes["CPD_MP"] == CPD_MP][[
-            "CPD_MP", "ENTREGA", "QTD_PENDENTE_OC"]].groupby(["CPD_MP", "ENTREGA"]).sum().reset_index()
-        # Busca as OPs somente do CPD em analise e soma as quantidades pendentes das ops agrupando por data.
-        ops = self.ops_pendentes[self.ops_pendentes["CPD_MP"] == CPD_MP][[
-            "CPD_MP", "ENTREGA", "COMPROMETIDO"]].groupby(["CPD_MP", "ENTREGA"]).sum().reset_index()
-
-        # Define um array com os DataFrames que serão mesclados
-        dfs_to_merge = [self.datas, ocs, ops]
-
-        # Mescla os DataFrames instanciando a timeline do item no objeto self.tl
-        self.tl = reduce(lambda left, right: pd.merge(
-            left, right, how="outer", sort="ENTREGA").fillna({ "CPD_MP": CPD_MP }), dfs_to_merge)
-
-        # Normaliza as quantidades pendentes para ZERO onde forem NaN
-        self.tl = self.tl.fillna({ "QTD_PENDENTE_OC": 0, "COMPROMETIDO": 0 }).sort_values(by="ENTREGA", ascending=True)
-
-        # Insere coluna no DataFrame self.tl
-        self.tl["SALDO_INICIAL"] = 0
-        self.tl["SALDO_FINAL"] = 0
-
-        # Define o saldo inicial da primeira data no self.tl
-        self.tl.loc[0, "SALDO_INICIAL"] = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"] == CPD_MP, "SALDO_INICIAL"].to_numpy()
-
-        # Define o saldo final da primeira data no self.tl
-        self.tl.loc[0, "SALDO_FINAL"] = self.tl.loc[0, "SALDO_INICIAL"] - self.tl.loc[0, "COMPROMETIDO"] + self.tl.loc[0, "QTD_PENDENTE_OC"]
-
-        self.tl = self.tl.set_index("ENTREGA").loc[:self.datas.iloc[-1].values[0]].reset_index()
-
-        # Calcula os saldos final e inicial para as demais linhas no self.tl
-        for l in range(1, len(self.tl)):
-            self.tl.loc[l, "SALDO_INICIAL"] = self.tl.loc[l-1, "SALDO_FINAL"]
-            self.tl.loc[l, "SALDO_FINAL"] = self.tl.loc[l, "SALDO_INICIAL"] - self.tl.loc[l, "COMPROMETIDO"] + self.tl.loc[l, "QTD_PENDENTE_OC"]
-
-        # Cria a coluna que indica SE e QUANDO ira faltar MP na self.tl
-        self.tl["FALTA"] = self.tl["SALDO_FINAL"] <= 0
-
-        # Checa se haverá falta em alguma data na TL
-        havera_falta = len(self.tl[self.tl["FALTA"] == True])
-
-        # Se houver falta na TL, verificar as datas e OPs em que havera e registrar no relatorio de faltas
-        if havera_falta:
-            dados = dict()
-
-            # Define as datas em que haverá falta de MP
-            self.datas_falta = self.tl[self.tl["FALTA"]][["ENTREGA", "CPD_MP"]]
-
-            # Define a primeira data em que haverá falta de MP
-            pri_data_falta = self.datas_falta["ENTREGA"].min()
-
-            # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
-            self.ops_falta = pd.merge(self.datas_falta, self.ops_pendentes.loc[self.ops_pendentes["CPD_MP"]==CPD_MP].set_index("ENTREGA"), on=["ENTREGA", "CPD_MP"], how="inner")
-
-            total_falta = self.ops_falta.sum()["COMPROMETIDO"]
-
-            self.ocs_futuras = self.check_purchases(CPD_MP, pri_data_falta)
-            self.ocs_futuras.loc[:, "ACUMULADO_OCS"] = self.ocs_futuras["QTD_PENDENTE_OC"].cumsum()
-
-            if len(self.ocs_futuras) > 0:
-                dados["acao_sugerida"] = "Antecipar"
-                self.ocs_antecipar = self.ocs_futuras.set_index("ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"]>= total_falta].iloc[0]["ENTREGA"]].reset_index()
-                dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(orient="records")
-                dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(orient="records")
-                dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
-                dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
-
-            else:
-                dados["acao_sugerida"] = "Comprar"
-
-                # Calcular Média de Vendas MRP
-                # Calcular Estoque Máximo MRP
-                # Verificar se saldo final da data que precisa de antecipação ficará acima do Estoque Máximo MRP
-                # Se ficar acima do estoque máximo, Criar alerta de estoque máximo
-
-            dados["quantidade_falta"] = self.ops_falta.sum()["COMPROMETIDO"]
-            dados["relatorio"] = self.ops_falta.reset_index().to_dict(orient="records")
-
-            self.faltas[CPD_MP] = dados
-
-    def check_purchases(self, CPD_MP, data_primeira_falta):
-        return self.ocs_pendentes[self.ocs_pendentes["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()
-
+#%%
 
 a = App(csv=False)
+
+
+#%%
+
+def timeline(self, CPD_MP):
+    # Define o horizonte de programação para o item em análise
+    horizonte_programacao = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"]
+                                                == CPD_MP]["HORIZONTE_PROGRAMACAO"].iloc[0] * 7
+
+    # Cria DataSeries com as todas as datas existentes
+    # entre hoje e o limite do horizonte de programação
+    self.datas = pd.DataFrame(
+        {
+            "ENTREGA":
+            pd.date_range(
+                pd.datetime.today().strftime('%Y-%m-%d'),
+                periods=horizonte_programacao
+            )
+        }
+    )
+
+    # Busca as OCs somente do CPD em analise e soma as quantidades pendentes das ocs agrupando por data.
+    ocs = self.ocs_pendentes.loc[self.ocs_pendentes["CPD_MP"] == CPD_MP][[
+        "CPD_MP", "ENTREGA", "QTD_PENDENTE_OC"]].groupby(["CPD_MP", "ENTREGA"]).sum().reset_index()
+    # Busca as OPs somente do CPD em analise e soma as quantidades pendentes das ops agrupando por data.
+    ops = self.ops_pendentes[self.ops_pendentes["CPD_MP"] == CPD_MP][[
+        "CPD_MP", "ENTREGA", "COMPROMETIDO"]].groupby(["CPD_MP", "ENTREGA"]).sum().reset_index()
+
+    # Define um array com os DataFrames que serão mesclados
+    dfs_to_merge = [self.datas, ocs, ops]
+
+    # Mescla os DataFrames instanciando a timeline do item no objeto self.tl
+    self.tl = reduce(lambda left, right: pd.merge(
+        left, right, how="outer", sort="ENTREGA").fillna({ "CPD_MP": CPD_MP }), dfs_to_merge)
+
+    # Normaliza as quantidades pendentes para ZERO onde forem NaN
+    self.tl = self.tl.fillna({ "QTD_PENDENTE_OC": 0, "COMPROMETIDO": 0 }).sort_values(by="ENTREGA", ascending=True)
+
+    # Insere coluna no DataFrame self.tl
+    self.tl["SALDO_INICIAL"] = 0
+    self.tl["SALDO_FINAL"] = 0
+
+    # Define o saldo inicial da primeira data no self.tl
+    self.tl.loc[0, "SALDO_INICIAL"] = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"] == CPD_MP, "SALDO_INICIAL"].to_numpy()
+
+    # Define o saldo final da primeira data no self.tl
+    self.tl.loc[0, "SALDO_FINAL"] = self.tl.loc[0, "SALDO_INICIAL"] - self.tl.loc[0, "COMPROMETIDO"] + self.tl.loc[0, "QTD_PENDENTE_OC"]
+
+    self.tl = self.tl.set_index("ENTREGA").loc[:self.datas.iloc[-1].values[0]].reset_index()
+
+    # Calcula os saldos final e inicial para as demais linhas no self.tl
+    for l in range(1, len(self.tl)):
+        self.tl.loc[l, "SALDO_INICIAL"] = self.tl.loc[l-1, "SALDO_FINAL"]
+        self.tl.loc[l, "SALDO_FINAL"] = self.tl.loc[l, "SALDO_INICIAL"] - self.tl.loc[l, "COMPROMETIDO"] + self.tl.loc[l, "QTD_PENDENTE_OC"]
+
+    # Cria a coluna que indica SE e QUANDO ira faltar MP na self.tl
+    self.tl["FALTA"] = self.tl["SALDO_FINAL"] <= 0
+
+    # Checa se haverá falta em alguma data na TL
+    havera_falta = len(self.tl[self.tl["FALTA"] == True])
+
+    # Se houver falta na TL, verificar as datas e OPs em que havera e registrar no relatorio de faltas
+    if havera_falta:
+        dados = dict()
+
+        # Define as datas em que haverá falta de MP
+        self.datas_falta = self.tl[self.tl["FALTA"]][["ENTREGA", "CPD_MP"]]
+
+        # Define a primeira data em que haverá falta de MP
+        pri_data_falta = self.datas_falta["ENTREGA"].min()
+
+        # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
+        self.ops_falta = pd.merge(self.datas_falta, self.ops_pendentes.loc[self.ops_pendentes["CPD_MP"]==CPD_MP].set_index("ENTREGA"), on=["ENTREGA", "CPD_MP"], how="inner")
+
+        total_falta = self.ops_falta.sum()["COMPROMETIDO"]
+        print(total_falta)
+
+        self.ocs_futuras = self.check_purchases(a, CPD_MP, pri_data_falta)
+        self.ocs_futuras.loc[:, "ACUMULADO_OCS"] = self.ocs_futuras["QTD_PENDENTE_OC"].cumsum()
+
+        if len(self.ocs_futuras) > 0:
+            dados["acao_sugerida"] = "Antecipar"
+            self.ocs_antecipar = self.ocs_futuras.set_index("ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"]>= total_falta].iloc[0]["ENTREGA"]].reset_index()
+            dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(orient="records")
+            dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(orient="records")
+            dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
+            dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
+
+        else:
+            dados["acao_sugerida"] = "Comprar"
+
+            # Calcular Média de Vendas MRP
+            # Calcular Estoque Máximo MRP
+            # Verificar se saldo final da data que precisa de antecipação ficará acima do Estoque Máximo MRP
+            # Se ficar acima do estoque máximo, Criar alerta de estoque máximo
+
+        dados["quantidade_falta"] = self.ops_falta.sum()["COMPROMETIDO"]
+        dados["relatorio"] = self.ops_falta.reset_index().to_dict(orient="records")
+
+        self.faltas[CPD_MP] = dados
+
+def check_purchases(self, CPD_MP, data_primeira_falta):
+    return self.ocs_pendentes[self.ocs_pendentes["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()
+
+
+setattr(a, "timeline", timeline)
+setattr(a, "check_purchases", check_purchases)
+
+a.timeline(a, 907)
+
+
+# %%

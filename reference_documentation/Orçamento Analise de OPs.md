@@ -15,8 +15,8 @@ Sistema que faça a análise de necessidades de matérias primas em uma ou mais 
   - [x] **Para qual(is) OP(s) ocorrerá** a falta;
   - [x] **Para qual(is) cliente(s)** ocorreá a falta;
   - [x] **De quanto** será a falta;
-  - [ ] **Ação sugerida** (Antecipar OC, Colocar OC):
-    - [ ] Se a sugestão for antecipar => **Qual OC antecipar**;
+  - [x] **Ação sugerida** (Antecipar OC, Colocar OC):
+    - [x] Se a sugestão for antecipar => **Qual OC antecipar**;
     - [ ] Se a sugestão for comprar => **Quanto comprar (*buscando respeitar o estoque máximo MRP*)**:
       - [ ] O sistema usará os parâmetros atuais já existentes do MRP para cálculo do estoque máximo;
       - [ ] Alertar o usuário se a sugestão ultrapassar o estoque máximo.
