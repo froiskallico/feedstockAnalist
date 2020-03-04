@@ -29,8 +29,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-# TODO: Here store DB URL
-DBNAME=None
 
 INSTALLED_APPS = [
     'feedStockAnalist.apps.FeedstockanalistConfig',
@@ -78,8 +76,11 @@ WSGI_APPLICATION = 'datateck.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'djongo',
+        'NAME': 'feedStockAnalist',
+        'HOST': 'mongodb+srv://datateck:Data2803@datateck0-yjact.mongodb.net/feedStockAnalist?retryWrites=true',
+        'USER': 'datateck',
+        'PASSWORD': 'Data2803',
     }
 }
 
