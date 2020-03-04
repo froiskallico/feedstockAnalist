@@ -3,7 +3,7 @@ from jsonfield import JSONField
 from feedStockAnalist.scripts.app import App
 
 # Create your models here.
-class analysis(models.Model):
+class Analysis(models.Model):
     created_at = models.DateTimeField()
     # TODO: Here associate a analysis to user
     # created_by = user.foreignkey
@@ -13,5 +13,4 @@ class analysis(models.Model):
     # may i need to call it from view and,
     # from there, store it to analysis field
     analysis = JSONField()
-
 

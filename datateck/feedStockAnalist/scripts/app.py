@@ -27,7 +27,7 @@ class App(object):
 
         # Se iniciar o App em movo CSV não cria conexão com Banco de Dados
         if not self.csv:
-            from database import Database
+            from feedStockAnalist.scripts.database import Database
             self.db = Database()
             if not self.lista_ops:
                 self.get_op()
@@ -424,6 +424,9 @@ class App(object):
 
             if len(self.ocs_futuras) > 0:
                 dados["acao_sugerida"] = "Antecipar"
+                print(total_falta)
+                print(self.ocs_futuras.set_index("ENTREGA"))
+                # TODO: Here calculate the anticipation and if it have unless the necessary to cover the total fault, throw an "purchase" action too
                 self.ocs_antecipar = self.ocs_futuras.set_index("ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"]>= total_falta].iloc[0]["ENTREGA"]].reset_index()
                 dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(orient="records")
                 dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(orient="records")
