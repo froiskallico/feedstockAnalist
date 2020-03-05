@@ -259,7 +259,6 @@ class App(object):
         # Obtem as ordens de produção pendentes para as MPs vinculadas à analise
         def sql():
             return pd.read_sql(
-                # TODO: HERE in the SQL Query take the last day of "Semana" where ise_geral.entrega and ipe.entrega is null
                 """
                 SELECT DISTINCT
                     FIC_GERAL.FK_PRO CPD_MP,
@@ -296,7 +295,6 @@ class App(object):
         # Normliza as datas para formato DateTime
         self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"])
 
-        # TODO: COMMENT CODE BELOW
         self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna()]
         self.ops_sem_data_com_semana["NSEM"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(0, 2).astype(int)
         self.ops_sem_data_com_semana["NANO"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(2, 6).astype(int)

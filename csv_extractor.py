@@ -188,7 +188,6 @@ class App(object):
     def get_ops_pendentes(self):
         # Obtem as ordens de produção pendentes para as MPs vinculadas à analise
         self.ops_pendentes = pd.read_sql(
-            # TODO: HERE in the SQL Query take the last day of "Semana" where ise_geral.entrega and ipe.entrega is null
             """
                 SELECT DISTINCT
                     FIC_GERAL.FK_PRO CPD_MP,
