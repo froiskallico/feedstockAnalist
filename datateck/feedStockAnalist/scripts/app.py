@@ -49,6 +49,9 @@ class App(object):
 
         self.faltas = dict()
 
+        self.faltas["OPs"] = self.lista_ops
+        self.faltas["quantidade_itens"] = len(self.mp_em_analise)
+
         for cpd in self.CPDs:
             self.timeline(CPD_MP=cpd)
 

@@ -10,10 +10,8 @@
     </header>
 
     <article class="p-4">
-        <p>{{ analysis_list }}</p>
-        <table
-            class="table-light table table-striped"
-        >
+
+        <table class="table-light table table-striped">
             <thead class="text-dark">
                 <tr>
                     <th>OP</th>
@@ -25,10 +23,12 @@
                 </tr>
             </thead>
             <tbody class='text-dark'>
+                {% for analyze in analysis_list %}
                 <tr>
-                    <td scope="row">123</td>
-                    <td>01/01/2020</td>
+                    <td scope="row">{{ analyze.id }}</td>
+                    <td>{{ analyze.created_at }}</td>
                     <td>207</td>
+                    <!-- TODO: Here load and parse analyze.report fields -->
                     <td>14</td>
                     <td>R$ 15.706,053</td>
                     <td>
@@ -40,21 +40,7 @@
                         </button>
                     </td>
                 </tr>
-                <tr>
-                    <td scope="row">456</td>
-                    <td>15/02/2020</td>
-                    <td>34</td>
-                    <td>3</td>
-                    <td>R$ 542,35</td>
-                    <td>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                        >
-                            Abrir
-                        </button>
-                    </td>
-                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </article>
