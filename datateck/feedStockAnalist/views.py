@@ -43,9 +43,7 @@ class NewAnalyzeView(generic.FormView):
 
     def form_valid(self, form):
         new_analyze = Analysis(created_at=timezone.now())
-        synthesis = self.analyze(form.cleaned_data["production_orders_list"])
-        json_synthesis = json.dumps(synthesis)
-        new_analyze.synthesis = json_synthesis
+        new_analyze.synthesis = self.analyze(form.cleaned_data["production_orders_list"])
         new_analyze.save()
         print(new_analyze)
         return super(NewAnalyzeView, self).form_valid(form)
