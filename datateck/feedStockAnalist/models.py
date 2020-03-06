@@ -8,4 +8,4 @@ from jsonfield import JSONField
 class Analysis(models.Model):
     created_at = models.DateTimeField()
     # created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete='', default="0")
-    report = JSONField()
+    synthesis = JSONField()

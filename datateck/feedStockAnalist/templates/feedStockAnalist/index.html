@@ -25,11 +25,11 @@
             <tbody class='text-dark'>
                 {% for analyze in analysis_list %}
                 <tr>
-                    <td scope="row">{{ analyze.id }}</td>
+                    <td scope="row">{{ analyze.synthesis.production_orders_to_analyze_list }}</td>
                     <td>{{ analyze.created_at }}</td>
-                    <td>207</td>
+                    <td>{{ analyze.synthesis.feedstock_items_count }}</td>
                     <!-- TODO: Here load and parse analyze.report fields -->
-                    <td>14</td>
+                    <td>{{ analyze.synthesis.fault_feedstock_items_count }}</td>
                     <td>R$ 15.706,053</td>
                     <td>
                         <button

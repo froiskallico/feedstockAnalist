@@ -13,13 +13,13 @@ class IndexView(generic.ListView):
 
     def get_queryset(self):
         analysis_from_db = Analysis.objects.all()
-        queryset = []
+        return analysis_from_db
 
-        for analyze in analysis_from_db:
-            analyze_converted = self.convert_analyze_report_from_json_to_dict(analyze)
-            queryset.append(analyze_converted)
+        # for analyze in analysis_from_db:
+        #     analyze_converted = self.convert_analyze_report_from_json_to_dict(analyze)
+        #     queryset.append(analyze_converted)
 
-        return queryset
+        # return queryset
 
     def convert_analyze_report_from_json_to_dict(self, analyze):
         analyze_report_as_dict = json.loads(analyze.report)

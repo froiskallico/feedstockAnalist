@@ -16,21 +16,24 @@ class App(object):
     def __init__(self):
         self.path_csv = '../../../../csv/'
 
-    def analyze(self, read_from_csv=False, POs_to_analyze_list=None):
+    def analyze(self, read_from_csv=False, production_orders_to_analyze_list=None):
+        self.synthesis = dict()
         print("\n\n 🤓 Iniciando análise de Matérias Primas")
         print("\n\n⏳ Por favor aguarde.")
 
         self.read_from_csv = read_from_csv
-        self.POs_to_analyze_list = POs_to_analyze_list
+        self.production_orders_to_analyze_list = production_orders_to_analyze_list
 
         # Se iniciar o App em movo CSV não cria conexão com Banco de Dados
         if not self.read_from_csv:
             from feedStockAnalist.scripts.database import Database
             self.db = Database()
 
-        self.get_op()
+        self.get_production_orders_to_analyze_list()
 
         print("\n\n🐹 Estamos colocando os hamsters para correrem! ")
+
+
 
         self.get_production_orders_to_analyze()
         self.get_products_to_analyze()
@@ -45,21 +48,22 @@ class App(object):
 
         self.faltas = dict()
 
-        self.faltas["OPs"] = self.POs_to_analyze_list
-        self.faltas["quantidade_itens"] = len(self.feedstock_to_analyze)
-
         for cpd in self.CPDs:
             self.timeline(CPD_MP=cpd)
+
+        self.synthesis["fault_feedstock_items_count"] = len(self.faltas)
 
         # return self.faltas
         return self.save_to_json()
 
-    def get_op(self):
+    def get_production_orders_to_analyze_list(self):
         # Define o numero da(s) OPS(s) a ser(em) analisada(s)
-        if not self.POs_to_analyze_list:
-            self.POs_to_analyze_list = input(
+        if not self.production_orders_to_analyze_list:
+            self.production_orders_to_analyze_list = input(
                 "Informe o numero da(s) op(s) para analisar: ")
-        return self.POs_to_analyze_list
+
+        self.synthesis["production_orders_to_analyze_list"] = self.production_orders_to_analyze_list
+        return self.production_orders_to_analyze_list
 
     def get_production_orders_to_analyze(self):
         # ANALISE
@@ -83,7 +87,7 @@ class App(object):
 
                     WHERE
                         OSE.PK_OSE IN ({})
-                """.format(str(self.POs_to_analyze_list)),
+                """.format(str(self.production_orders_to_analyze_list)),
                 self.db.connection)
 
         def fetch_data_from_csv():
@@ -122,7 +126,7 @@ class App(object):
 
                 WHERE
                     OSE.PK_OSE IN ({})
-            """.format(self.POs_to_analyze_list),
+            """.format(self.production_orders_to_analyze_list),
                 self.db.connection
             )
 
@@ -165,7 +169,7 @@ class App(object):
 
                 WHERE
                     ISE.FK_OSE IN ({})
-            """.format(self.POs_to_analyze_list),
+            """.format(self.production_orders_to_analyze_list),
                 self.db.connection
             )
 
@@ -191,6 +195,12 @@ class App(object):
 
             self.feedstock_to_analyze["SALDO_INICIAL"] = sum([self.feedstock_to_analyze[field] for field in stocks])
 
+        def calculate_feedstock_items_count():
+            return len(self.feedstock_to_analyze)
+
+        def save_feedstock_items_count_to_synthesis():
+            self.synthesis["feedstock_items_count"] = calculate_feedstock_items_count()
+
         data_to_normalize = {"PERC_ESTOQUE_LP": 50,
                              "PERC_ESTOQUE_CORTE": 50,
                              "HORIZONTE_PROGRAMACAO": 100}
@@ -198,8 +208,7 @@ class App(object):
         normalize_fields(data_to_normalize)
         calculate_stocks_to_consider()
         calculate_opening_balance()
-
-        print(self.feedstock_to_analyze.to_string())
+        save_feedstock_items_count_to_synthesis()
 
     def get_fic_tec(self):
         # Obtém as fichas técnicas dos chicotes vinculados às OPs em análise
@@ -222,7 +231,7 @@ class App(object):
                 GROUP BY
                     CPD_CHICOTE,
                     CPD_MP
-            """.format(self.POs_to_analyze_list),
+            """.format(self.production_orders_to_analyze_list),
             self.db.connection
         )
 
@@ -251,7 +260,7 @@ class App(object):
                 WHERE
                     IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0) > 0 AND
                     ISE.FK_OSE IN ({})
-            """.format(self.POs_to_analyze_list),
+            """.format(self.production_orders_to_analyze_list),
                 self.db.connection
             )
 
@@ -291,7 +300,7 @@ class App(object):
                 WHERE
                     ISE_GERAL.QUANTIDADE - COALESCE(ISE_GERAL.QTD_CANC, 0) - COALESCE(ISE_GERAL.QTD_PROD, 0) > 0 AND
                     ISE_OP.FK_OSE IN ({})
-        """.format(self.POs_to_analyze_list),
+        """.format(self.production_orders_to_analyze_list),
                 self.db.connection
             )
 
