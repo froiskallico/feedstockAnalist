@@ -6,51 +6,47 @@ from functools import reduce
 import json
 from io import StringIO
 
-inicio = datetime.now()
+start_time = datetime.now()
 
 pd.options.mode.chained_assignment = None
 
+
 class App(object):
 
-    def __init__(self, csv=False, lista_ops=None):
-        self.csv = csv
-        self.lista_ops = lista_ops
+    def __init__(self):
+        self.path_csv = '../../../../csv/'
 
-        self.path_csv = './csv/'
-
-    def analist(self):
+    def analyze(self, read_from_csv=False, POs_to_analyze_list=None):
         print("\n\n 🤓 Iniciando análise de Matérias Primas")
         print("\n\n⏳ Por favor aguarde.")
 
-
-        # Instancia as variávies e data frames para rodar a análise
+        self.read_from_csv = read_from_csv
+        self.POs_to_analyze_list = POs_to_analyze_list
 
         # Se iniciar o App em movo CSV não cria conexão com Banco de Dados
-        if not self.csv:
+        if not self.read_from_csv:
             from feedStockAnalist.scripts.database import Database
             self.db = Database()
-            if not self.lista_ops:
-                self.get_op()
+
+        self.get_op()
 
         print("\n\n🐹 Estamos colocando os hamsters para correrem! ")
 
-        self.ops_em_analise = self.get_ops_em_analise()
-
-        self.get_chicotes_em_analise()
-        self.get_mps_em_analise()
-        # self.get_fic_tec()
-        self.get_ocs_pendentes()
+        self.get_production_orders_to_analyze()
+        self.get_products_to_analyze()
+        self.get_feedstock_to_analyze()
+        self.get_open_purchase_orders()
         self.get_ops_pendentes()
 
         # self.what_the_print()
 
-        self.CPDs = self.mp_em_analise["CPD_MP"]
+        self.CPDs = self.feedstock_to_analyze["CPD_MP"]
         # self.CPDs = {907}
 
         self.faltas = dict()
 
-        self.faltas["OPs"] = self.lista_ops
-        self.faltas["quantidade_itens"] = len(self.mp_em_analise)
+        self.faltas["OPs"] = self.POs_to_analyze_list
+        self.faltas["quantidade_itens"] = len(self.feedstock_to_analyze)
 
         for cpd in self.CPDs:
             self.timeline(CPD_MP=cpd)
@@ -60,15 +56,16 @@ class App(object):
 
     def get_op(self):
         # Define o numero da(s) OPS(s) a ser(em) analisada(s)
-        self.lista_ops = input("Informe o numero da(s) op(s) para analisar: ")
-        # self.lista_ops = 114562
+        if not self.POs_to_analyze_list:
+            self.POs_to_analyze_list = input(
+                "Informe o numero da(s) op(s) para analisar: ")
+        return self.POs_to_analyze_list
 
-    def get_ops_em_analise(self):
+    def get_production_orders_to_analyze(self):
         # ANALISE
         # |-OPS
 
-        # Busca do Banco de Dados de Origem as OPs para analise
-        def sql():
+        def fetch_data_from_database():
             return pd.read_sql(
                 """
                     SELECT
@@ -86,17 +83,18 @@ class App(object):
 
                     WHERE
                         OSE.PK_OSE IN ({})
-                """.format(str(self.lista_ops)),
+                """.format(str(self.POs_to_analyze_list)),
                 self.db.connection)
 
-
-        # Busca do arqiuvo CSV
-        def csv():
+        def fetch_data_from_csv():
             return pd.read_csv(self.path_csv + 'ops_em_analise.csv')
 
-        self.ops_em_analise = csv() if self.csv else sql()
+        self.production_orders_to_analyze = fetch_data_from_csv(
+        ) if self.read_from_csv else fetch_data_from_database()
 
-    def get_chicotes_em_analise(self):
+        return self.production_orders_to_analyze
+
+    def get_products_to_analyze(self):
         # Obtém a lista de chicotes vinculados às OPs que estão sendo analisadas
         #
         # ANALISE
@@ -104,7 +102,7 @@ class App(object):
         #   |-CHICOTES
         #
 
-        def sql():
+        def fetch_data_from_database():
             return pd.read_sql(
                 """
                 SELECT
@@ -124,16 +122,19 @@ class App(object):
 
                 WHERE
                     OSE.PK_OSE IN ({})
-            """.format(self.lista_ops),
+            """.format(self.POs_to_analyze_list),
                 self.db.connection
             )
 
-        def csv():
-            return pd.read_csv(self.path_csv + "chicotes_em_analise.csv")
+        def fetch_data_from_csv():
+            return pd.read_csv(self.path_csv + "produtos_em_analise.csv")
 
-        self.chicotes_em_analise = csv() if self.csv else sql()
+        self.products_to_analyze = fetch_data_from_csv(
+        ) if self.read_from_csv else fetch_data_from_database()
 
-    def get_mps_em_analise(self):
+        return self.products_to_analyze
+
+    def get_feedstock_to_analyze(self):
         # Obtém a lista de Matérias Primas vinculadas aos chicotes em análise
         #
         # ANALISE
@@ -142,7 +143,7 @@ class App(object):
         #     |-MATERIAS PRIMAS
         #
 
-        def sql():
+        def fetch_data_from_database():
             return pd.read_sql(
                 """
                 SELECT DISTINCT
@@ -164,37 +165,41 @@ class App(object):
 
                 WHERE
                     ISE.FK_OSE IN ({})
-            """.format(self.lista_ops),
+            """.format(self.POs_to_analyze_list),
                 self.db.connection
             )
 
-        def csv():
+        def fetch_data_from_csv():
             return pd.read_csv(self.path_csv + 'mp_em_analise.csv')
 
-        self.mp_em_analise = csv() if self.csv else sql()
+        self.feedstock_to_analyze = fetch_data_from_csv() if self.read_from_csv else fetch_data_from_database()
 
-        # Normaliza os percentuais a considerar dos estoques LP e Corte
-        self.mp_em_analise = self.mp_em_analise.fillna(
-            value={"PERC_ESTOQUE_LP": 50}).replace({'PERC_ESTOQUE_LP': 0}, 50)
-        self.mp_em_analise = self.mp_em_analise.fillna(
-            value={"PERC_ESTOQUE_CORTE": 50}).replace({'PERC_ESTOQUE_CORTE': 0}, 50)
-        self.mp_em_analise = self.mp_em_analise.fillna(
-            value={"HORIZONTE_PROGRAMACAO": 100}).replace({'HORIZONTE_PROGRAMACAO': 100})
+        def normalize_fields(dict_of_data_to_normalize):
+            for key, value in dict_of_data_to_normalize.items():
+                self.feedstock_to_analyze = self.feedstock_to_analyze.fillna(value={ key: value }).replace({ key: 0 }, value)
 
-        # Aplica os percentuais a considerar em cada estoque (LP/Corte)
-        self.mp_em_analise["ESTOQUE_LP_CONSIDERADO"] = self.mp_em_analise["ESTOQUE_LP"] * (
-            self.mp_em_analise["PERC_ESTOQUE_LP"]/100)
-        self.mp_em_analise["ESTOQUE_CORTE_CONSIDERADO"] = self.mp_em_analise["ESTOQUE_CORTE"] * (
-            self.mp_em_analise["PERC_ESTOQUE_CORTE"]/100)
+        def calculate_stocks_to_consider():
+            self.feedstock_to_analyze["ESTOQUE_LP_CONSIDERADO"] = self.feedstock_to_analyze["ESTOQUE_LP"] * (self.feedstock_to_analyze["PERC_ESTOQUE_LP"]/100)
+            self.feedstock_to_analyze["ESTOQUE_CORTE_CONSIDERADO"] = self.feedstock_to_analyze["ESTOQUE_CORTE"] * (self.feedstock_to_analyze["PERC_ESTOQUE_CORTE"]/100)
 
-        # Calcula o saldo inicial das matérias primas
-        estoques = (
-            "ESTOQUE",
-            "ESTOQUE_LP_CONSIDERADO",
-            "ESTOQUE_CORTE_CONSIDERADO"
-        )
-        self.mp_em_analise["SALDO_INICIAL"] = sum(
-            [self.mp_em_analise[campo] for campo in estoques])
+        def calculate_opening_balance():
+            stocks = (
+                "ESTOQUE",
+                "ESTOQUE_LP_CONSIDERADO",
+                "ESTOQUE_CORTE_CONSIDERADO"
+            )
+
+            self.feedstock_to_analyze["SALDO_INICIAL"] = sum([self.feedstock_to_analyze[field] for field in stocks])
+
+        data_to_normalize = {"PERC_ESTOQUE_LP": 50,
+                             "PERC_ESTOQUE_CORTE": 50,
+                             "HORIZONTE_PROGRAMACAO": 100}
+
+        normalize_fields(data_to_normalize)
+        calculate_stocks_to_consider()
+        calculate_opening_balance()
+
+        print(self.feedstock_to_analyze.to_string())
 
     def get_fic_tec(self):
         # Obtém as fichas técnicas dos chicotes vinculados às OPs em análise
@@ -217,13 +222,13 @@ class App(object):
                 GROUP BY
                     CPD_CHICOTE,
                     CPD_MP
-            """.format(self.lista_ops),
+            """.format(self.POs_to_analyze_list),
             self.db.connection
         )
 
-    def get_ocs_pendentes(self):
+    def get_open_purchase_orders(self):
         # Obtem as ordens de compras pendentes para as MPs vinculadas à analise
-        def sql():
+        def fetch_data_from_database():
             return pd.read_sql(
                 """
                 SELECT DISTINCT
@@ -246,21 +251,21 @@ class App(object):
                 WHERE
                     IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0) > 0 AND
                     ISE.FK_OSE IN ({})
-            """.format(self.lista_ops),
+            """.format(self.POs_to_analyze_list),
                 self.db.connection
             )
 
-        def csv():
+        def fetch_data_from_csv():
             return pd.read_csv(self.path_csv + 'ocs_pendentes.csv')
 
-        self.ocs_pendentes = csv() if self.csv else sql()
+        self.open_purchase_orders = fetch_data_from_csv() if self.read_from_csv else fetch_data_from_database()
 
         # Normliza as datas para formato DateTime
-        self.ocs_pendentes["ENTREGA"] = pd.to_datetime(self.ocs_pendentes["ENTREGA"])
+        self.open_purchase_orders["ENTREGA"] = pd.to_datetime(self.open_purchase_orders["ENTREGA"])
 
     def get_ops_pendentes(self):
         # Obtem as ordens de produção pendentes para as MPs vinculadas à analise
-        def sql():
+        def fetch_data_from_database():
             return pd.read_sql(
                 """
                 SELECT DISTINCT
@@ -286,44 +291,52 @@ class App(object):
                 WHERE
                     ISE_GERAL.QUANTIDADE - COALESCE(ISE_GERAL.QTD_CANC, 0) - COALESCE(ISE_GERAL.QTD_PROD, 0) > 0 AND
                     ISE_OP.FK_OSE IN ({})
-        """.format(self.lista_ops),
+        """.format(self.POs_to_analyze_list),
                 self.db.connection
             )
 
-        def csv():
-            return pd.read_csv(self.path_csv + 'ops_pendentes.csv', dtype = { 'SEMANA_ENTREGA': str })
+        def fetch_data_from_csv():
+            return pd.read_csv(self.path_csv + 'ops_pendentes.csv', dtype={'SEMANA_ENTREGA': str})
 
-        self.ops_pendentes = csv() if self.csv else sql()
+        self.ops_pendentes = fetch_data_from_csv(
+        ) if self.read_from_csv else fetch_data_from_database()
 
         # Normliza as datas para formato DateTime
-        self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"])
+        self.ops_pendentes["ENTREGA"] = pd.to_datetime(
+            self.ops_pendentes["ENTREGA"])
 
-        self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna()]
-        self.ops_sem_data_com_semana["NSEM"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(0, 2).astype(int)
-        self.ops_sem_data_com_semana["NANO"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(2, 6).astype(int)
-        self.ops_sem_data_com_semana["FDOY"] = pd.to_datetime(dict(year=self.ops_sem_data_com_semana["NANO"], month=1, day=1))
+        self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna(
+        )]
+        self.ops_sem_data_com_semana["NSEM"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(
+            0, 2).astype(int)
+        self.ops_sem_data_com_semana["NANO"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(
+            2, 6).astype(int)
+        self.ops_sem_data_com_semana["FDOY"] = pd.to_datetime(
+            dict(year=self.ops_sem_data_com_semana["NANO"], month=1, day=1))
         self.ops_sem_data_com_semana["FDOYWD"] = self.ops_sem_data_com_semana["FDOY"].dt.weekday
-        self.ops_sem_data_com_semana["ENTREGA_NOVA"] = self.ops_sem_data_com_semana["FDOY"] + pd.to_timedelta(self.ops_sem_data_com_semana["NSEM"] * 7 - 3 - self.ops_sem_data_com_semana["FDOYWD"], 'D')
-        self.ops_sem_data_com_semana = self.ops_sem_data_com_semana["ENTREGA"].fillna(self.ops_sem_data_com_semana["ENTREGA_NOVA"])
+        self.ops_sem_data_com_semana["ENTREGA_NOVA"] = self.ops_sem_data_com_semana["FDOY"] + pd.to_timedelta(
+            self.ops_sem_data_com_semana["NSEM"] * 7 - 3 - self.ops_sem_data_com_semana["FDOYWD"], 'D')
+        self.ops_sem_data_com_semana = self.ops_sem_data_com_semana["ENTREGA"].fillna(
+            self.ops_sem_data_com_semana["ENTREGA_NOVA"])
 
-
-        self.ops_pendentes["ENTREGA"] = self.ops_pendentes["ENTREGA"].fillna(self.ops_sem_data_com_semana)
+        self.ops_pendentes["ENTREGA"] = self.ops_pendentes["ENTREGA"].fillna(
+            self.ops_sem_data_com_semana)
 
     def what_the_print(self):
         # print("OPS")
-        # pprint(self.ops_em_analise)
+        # pprint(self.production_orders_to_analyze)
         # pprint('-' * 120)
         # print("CHICOTES")
-        # pprint(self.chicotes_em_analise)
+        # pprint(self.products_to_analyze)
         # pprint('-' * 120)
         # print("MP")
-        # pprint(self.mp_em_analise)
+        # pprint(self.feedstock_to_analyze)
         # pprint('-' * 120)
         # # print("FIC_TEC")
         # # pprint(self.fic_tec)
         # # pprint('-' * 120)
         # print("OCS")
-        # pprint(self.ocs_pendentes)
+        # pprint(self.open_purchase_orders)
         # pprint('-' * 120)
         # print("OPS")
         # pprint(self.ops_pendentes)
@@ -340,9 +353,10 @@ class App(object):
 
         final = datetime.now()
 
-        tempo = final - inicio
+        tempo = final - start_time
 
-        print("\n\nForam identificados {} itens com faltas iminentes.".format(str(len(self.faltas))))
+        print("\n\nForam identificados {} itens com faltas iminentes.".format(
+            str(len(self.faltas))))
         print("\n\n⏱ Tempo decorrido: {}\n\n".format(str(tempo)))
         print("*** 😁 FIM 😁 ***")
 
@@ -350,8 +364,8 @@ class App(object):
 
     def timeline(self, CPD_MP):
         # Define o horizonte de programação para o item em análise
-        horizonte_programacao = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"]
-                                                    == CPD_MP]["HORIZONTE_PROGRAMACAO"].iloc[0] * 7
+        horizonte_programacao = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]
+                                                              == CPD_MP]["HORIZONTE_PROGRAMACAO"].iloc[0] * 7
 
         # Cria DataSeries com as todas as datas existentes
         # entre hoje e o limite do horizonte de programação
@@ -366,7 +380,7 @@ class App(object):
         )
 
         # Busca as OCs somente do CPD em analise e soma as quantidades pendentes das ocs agrupando por data.
-        ocs = self.ocs_pendentes.loc[self.ocs_pendentes["CPD_MP"] == CPD_MP][[
+        ocs = self.open_purchase_orders.loc[self.open_purchase_orders["CPD_MP"] == CPD_MP][[
             "CPD_MP", "ENTREGA", "QTD_PENDENTE_OC"]].groupby(["CPD_MP", "ENTREGA"]).sum().reset_index()
         # Busca as OPs somente do CPD em analise e soma as quantidades pendentes das ops agrupando por data.
         ops = self.ops_pendentes[self.ops_pendentes["CPD_MP"] == CPD_MP][[
@@ -377,27 +391,33 @@ class App(object):
 
         # Mescla os DataFrames instanciando a timeline do item no objeto self.tl
         self.tl = reduce(lambda left, right: pd.merge(
-            left, right, how="outer", sort="ENTREGA").fillna({ "CPD_MP": CPD_MP }), dfs_to_merge)
+            left, right, how="outer", sort="ENTREGA").fillna({"CPD_MP": CPD_MP}), dfs_to_merge)
 
         # Normaliza as quantidades pendentes para ZERO onde forem NaN
-        self.tl = self.tl.fillna({ "QTD_PENDENTE_OC": 0, "COMPROMETIDO": 0 }).sort_values(by="ENTREGA", ascending=True)
+        self.tl = self.tl.fillna({"QTD_PENDENTE_OC": 0, "COMPROMETIDO": 0}).sort_values(
+            by="ENTREGA", ascending=True)
 
         # Insere coluna no DataFrame self.tl
         self.tl["SALDO_INICIAL"] = 0
         self.tl["SALDO_FINAL"] = 0
 
         # Define o saldo inicial da primeira data no self.tl
-        self.tl.loc[0, "SALDO_INICIAL"] = self.mp_em_analise.loc[self.mp_em_analise["CPD_MP"] == CPD_MP, "SALDO_INICIAL"].to_numpy()
+        self.tl.loc[0, "SALDO_INICIAL"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]
+                                                                        == CPD_MP, "SALDO_INICIAL"].to_numpy()
 
         # Define o saldo final da primeira data no self.tl
-        self.tl.loc[0, "SALDO_FINAL"] = self.tl.loc[0, "SALDO_INICIAL"] - self.tl.loc[0, "COMPROMETIDO"] + self.tl.loc[0, "QTD_PENDENTE_OC"]
+        self.tl.loc[0, "SALDO_FINAL"] = self.tl.loc[0, "SALDO_INICIAL"] - \
+            self.tl.loc[0, "COMPROMETIDO"] + self.tl.loc[0, "QTD_PENDENTE_OC"]
 
-        self.tl = self.tl.set_index("ENTREGA").loc[:self.datas.iloc[-1].values[0]].reset_index()
+        self.tl = self.tl.set_index(
+            "ENTREGA").loc[:self.datas.iloc[-1].values[0]].reset_index()
 
         # Calcula os saldos final e inicial para as demais linhas no self.tl
         for l in range(1, len(self.tl)):
             self.tl.loc[l, "SALDO_INICIAL"] = self.tl.loc[l-1, "SALDO_FINAL"]
-            self.tl.loc[l, "SALDO_FINAL"] = self.tl.loc[l, "SALDO_INICIAL"] - self.tl.loc[l, "COMPROMETIDO"] + self.tl.loc[l, "QTD_PENDENTE_OC"]
+            self.tl.loc[l, "SALDO_FINAL"] = self.tl.loc[l, "SALDO_INICIAL"] - \
+                self.tl.loc[l, "COMPROMETIDO"] + \
+                self.tl.loc[l, "QTD_PENDENTE_OC"]
 
         # Cria a coluna que indica SE e QUANDO ira faltar MP na self.tl
         self.tl["FALTA"] = self.tl["SALDO_FINAL"] <= 0
@@ -416,24 +436,29 @@ class App(object):
             pri_data_falta = self.datas_falta["ENTREGA"].min()
 
             # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
-            self.ops_falta = pd.merge(self.datas_falta, self.ops_pendentes.loc[self.ops_pendentes["CPD_MP"]==CPD_MP].set_index("ENTREGA"), on=["ENTREGA", "CPD_MP"], how="inner")
+            self.ops_falta = pd.merge(self.datas_falta, self.ops_pendentes.loc[self.ops_pendentes["CPD_MP"] == CPD_MP].set_index(
+                "ENTREGA"), on=["ENTREGA", "CPD_MP"], how="inner")
 
             total_falta = self.ops_falta.sum()["COMPROMETIDO"]
 
             self.ocs_futuras = self.check_purchases(CPD_MP, pri_data_falta)
-            self.ocs_futuras.loc[:, "ACUMULADO_OCS"] = self.ocs_futuras["QTD_PENDENTE_OC"].cumsum()
+            self.ocs_futuras.loc[:,
+                                 "ACUMULADO_OCS"] = self.ocs_futuras["QTD_PENDENTE_OC"].cumsum()
 
             if len(self.ocs_futuras) > 0:
                 dados["acao_sugerida"] = "Antecipar"
                 # TODO: Here calculate the anticipation and if it have unless the necessary to cover the total fault, throw an "purchase" action too
                 try:
-                    self.ocs_antecipar = self.ocs_futuras.set_index("ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"]>= total_falta].iloc[0]["ENTREGA"]].reset_index()
+                    self.ocs_antecipar = self.ocs_futuras.set_index(
+                        "ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"] >= total_falta].iloc[0]["ENTREGA"]].reset_index()
                 except:
                     dados["acao_sugerida"] = "Comprar"
                     return
 
-                dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(orient="records")
-                dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(orient="records")
+                dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(
+                    orient="records")
+                dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(
+                    orient="records")
                 dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
                 dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
 
@@ -446,9 +471,10 @@ class App(object):
                 # Se ficar acima do estoque máximo, Criar alerta de estoque máximo
 
             dados["quantidade_falta"] = self.ops_falta.sum()["COMPROMETIDO"]
-            dados["relatorio"] = self.ops_falta.reset_index().to_dict(orient="records")
+            dados["relatorio"] = self.ops_falta.reset_index().to_dict(
+                orient="records")
 
             self.faltas[CPD_MP] = dados
 
     def check_purchases(self, CPD_MP, data_primeira_falta):
-        return self.ocs_pendentes[self.ocs_pendentes["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()
+        return self.open_purchase_orders[self.open_purchase_orders["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()
