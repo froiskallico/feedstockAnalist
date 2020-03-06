@@ -53,6 +53,8 @@ class App(object):
 
         self.synthesis["fault_feedstock_items_count"] = len(self.faltas)
 
+
+
         # return self.faltas
         return self.save_to_json()
 
@@ -434,6 +436,8 @@ class App(object):
         # Checa se haverá falta em alguma data na TL
         havera_falta = len(self.tl[self.tl["FALTA"] == True])
 
+        self.synthesis["total_cost_of_actions"] = 0
+
         # Se houver falta na TL, verificar as datas e OPs em que havera e registrar no relatorio de faltas
         if havera_falta:
             dados = dict()
@@ -470,6 +474,8 @@ class App(object):
                     orient="records")
                 dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
                 dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
+
+                self.synthesis["total_cost_of_actions"] += self.ocs_antecipar["VALOR_TOTAL"].sum()
 
             else:
                 dados["acao_sugerida"] = "Comprar"

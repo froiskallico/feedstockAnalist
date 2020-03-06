@@ -1,6 +1,10 @@
 {% extends 'feedStockAnalist/base.html' %}
 
 {% block content %}
-<h1> Hello World</h1>
+{% csrf_token %}
+
+{% for analyze in analysis %}
+<p>{{ analyze }}</p>
+{% endfor %}
 {% endblock %}
 

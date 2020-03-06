@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.views import generic
+from django.utils import timezone
 
 from feedStockAnalist.scripts.app import App
+from feedStockAnalist.forms import CreateAnalyzeForm
 from .models import Analysis
 
 import json
@@ -27,20 +29,33 @@ class IndexView(generic.ListView):
         analyze_parsed.report = analyze_report_as_dict
         return analyze_parsed
 
-
-
-
-
 class DetailView(generic.TemplateView):
+    model = Analysis
     template_name = 'feedStockAnalist/detail.html'
 
     def get_queryset(self):
-        return []
+        return Analysis.objects.all()
 
-class NewAnalyzeView(generic.CreateView):
-    pass
+class NewAnalyzeView(generic.FormView):
+    form_class = CreateAnalyzeForm
+    template_name = 'feedStockAnalist/new_analyze.html'
+    success_url = '/'
 
-    # TODO: Here call App(csv=True, lista_ops=(114562)).analist() on analysis creation
-    # may not to call it here,
-    # may i need to call it from view and,
-    # from there, store it to analysis field
+    def form_valid(self, form):
+        new_analyze = Analysis(created_at=timezone.now())
+        synthesis = self.analyze(form.cleaned_data["production_orders_list"])
+        json_synthesis = json.dumps(synthesis)
+        new_analyze.synthesis = json_synthesis
+        new_analyze.save()
+        print(new_analyze)
+        return super(NewAnalyzeView, self).form_valid(form)
+
+
+    def analyze(self, production_orders_to_analyze):
+        analyze = App()
+        analyze.analyze(production_orders_to_analyze_list=production_orders_to_analyze)
+        return analyze.synthesis
+
+
+
+

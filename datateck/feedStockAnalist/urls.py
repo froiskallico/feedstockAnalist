@@ -6,5 +6,6 @@ from . import views
 app_name='feedStockAnalist'
 urlpatterns = [
     path('', login_required(views.IndexView.as_view())),
-    path('detail/', views.DetailView.as_view(), name='detail')
+    path('new/', views.NewAnalyzeView.as_view(), name='new'),
+    path('<int:pk>/', views.DetailView.as_view(), name='detail'),
 ]
