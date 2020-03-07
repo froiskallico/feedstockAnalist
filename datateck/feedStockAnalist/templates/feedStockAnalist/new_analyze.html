@@ -1,5 +1,36 @@
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Create new Analyze">
-</form>
+{% extends 'feedStockAnalist/base.html' %} {% block content %}
+
+<section class="container half-opacity rounded p-4 col-sm-4 center mx-auto my-auto row">
+    <form method="POST center">
+        {% csrf_token %}
+        <div class="form-group">
+            <input
+                type="hidden"
+                name="csrfmiddlewaretoken"
+                value="WR82jCA5rDXT4X6YZAttMGZEf0tKBSWz59ru5BEiYbRIrHESXQEHhvMGGWpIVFRS"
+            />
+            <p>
+                <label
+                    for="id_production_orders_list"
+                    class="text-light"
+                >
+                    Ordens de produção para analisar:
+                </label>
+                <input
+                    type="text"
+                    name="production_orders_list"
+                    class="form-control"
+                    placeholder="Separar por vírgulas. E.g: (123, 456)"
+                    required
+                    id="id_production_orders_list"
+                />
+            </p>
+        </div>
+        <input
+            type="submit"
+            value="Create new Analyze"
+            class="btn btn-success"
+        />
+    </form>
+</section>
+{% endblock %}
