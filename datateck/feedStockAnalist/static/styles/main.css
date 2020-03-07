@@ -1,0 +1,20 @@
+{% load static %}
+
+body {
+    background: url("../images/backgrounds/main.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.575);
+    position: fixed;
+    height: 100%;
+    width: 100%;
+}
+
+.half-opacity {
+    background-color: rgba(40, 40, 40, .60);
+}

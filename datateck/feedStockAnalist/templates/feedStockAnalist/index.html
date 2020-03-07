@@ -1,10 +1,10 @@
 {% extends 'feedStockAnalist/base.html' %}
 
 {% block content %}
-<section class="container bg-secondary rounded p-2">
+<section class="container half-opacity rounded p-2">
     <header class="row p-4">
         <h4 class="text-white col-xl-10">Últimas análises</h4>
-        <a href="/new/" type="button" class="btn btn-light col-sm-2">
+        <a href="/new/" type="button" class="btn btn-success col-sm-2">
             Iniciar nova análise
         </a>
     </header>
@@ -32,7 +32,7 @@
                     <td>{{ analyze.synthesis.fault_feedstock_items_count }}</td>
                     <td>R$ 15.706,053</td>
                     <td>
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-outline-dark">
                             Abrir
                         </button>
                     </td>
