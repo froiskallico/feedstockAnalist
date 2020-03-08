@@ -9,7 +9,7 @@
         </a>
     </header>
 
-    <div class="card">
+    <div class="card m-3">
         <div class="table-responsive">
             <table class="table-light table table-bordered table-striped">
                 <thead>
@@ -30,7 +30,7 @@
                         <td>{{ analyze.synthesis.feedstock_items_count }}</td>
                         <!-- TODO: Here load and parse analyze.report fields -->
                         <td>{{ analyze.synthesis.fault_feedstock_items_count }}</td>
-                        <td>R$ 15.706,053</td>
+                        <td>{{ analyze.synthesis.total_cost_of_actions }}</td>
                         <td>
                             <button type="button" class="btn btn-outline-dark">
                                 Abrir
