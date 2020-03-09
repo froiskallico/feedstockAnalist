@@ -21,3 +21,7 @@ body {
 .brand-img {
     max-height: 48px;
 }
+
+.hr-light {
+    border: 0.5px solid #444;
+}

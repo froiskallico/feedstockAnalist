@@ -9,3 +9,7 @@ class Analysis(models.Model):
     created_at = models.DateTimeField()
     # created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete='', default="0")
     synthesis = JSONField()
+
+class Reports(models.Model):
+    analysis = models.ForeignKey(Analysis, on_delete=models.PROTECT)
+    report = JSONField()

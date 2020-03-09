@@ -1,10 +1,10 @@
-from django.shortcuts import render
 from django.views import generic
 from django.utils import timezone
+from django.shortcuts import render
 
 from feedStockAnalist.scripts.app import App
 from feedStockAnalist.forms import CreateAnalyzeForm
-from .models import Analysis
+from .models import Analysis, Reports
 
 import json
 
@@ -30,11 +30,16 @@ class IndexView(generic.ListView):
         return analyze_parsed
 
 class DetailView(generic.TemplateView):
-    model = Analysis
     template_name = 'feedStockAnalist/detail.html'
 
-    def get_queryset(self):
-        return Analysis.objects.all()
+    def get_context_data(self, pk):
+        analysis = Analysis.objects.get(pk=pk)
+        report = analysis.reports_set.filter(analysis__id=pk)[0]
+        context = super(DetailView, self).get_context_data()
+        context["synthesis"] = analysis.synthesis
+        context["report"] = json.loads(report.report)
+
+        return context
 
 class NewAnalyzeView(generic.FormView):
     form_class = CreateAnalyzeForm
@@ -42,17 +47,18 @@ class NewAnalyzeView(generic.FormView):
     success_url = '/'
 
     def form_valid(self, form):
-        new_analyze = Analysis(created_at=timezone.now())
-        new_analyze.synthesis = self.analyze(form.cleaned_data["production_orders_list"])
-        new_analyze.save()
-        print(new_analyze)
+        self.new_analyze = Analysis(created_at=timezone.now())
+        self.analyze(form.cleaned_data["production_orders_list"])
         return super(NewAnalyzeView, self).form_valid(form)
 
 
     def analyze(self, production_orders_to_analyze):
         analyze = App()
         analyze.analyze(production_orders_to_analyze_list=production_orders_to_analyze)
-        return analyze.synthesis
+        self.new_analyze.synthesis = analyze.synthesis
+        self.new_analyze.save()
+        self.new_analyze.reports_set.create(report=analyze.save_to_json())
+        return True
 
 
 

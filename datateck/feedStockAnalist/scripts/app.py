@@ -46,18 +46,15 @@ class App(object):
         self.CPDs = self.feedstock_to_analyze["CPD_MP"]
         # self.CPDs = {907}
 
-        self.faltas = dict()
+        self.report = dict()
 
         self.synthesis["total_cost_of_actions"] = 0
 
         for cpd in self.CPDs:
             self.timeline(CPD_MP=cpd)
 
-        self.synthesis["fault_feedstock_items_count"] = len(self.faltas)
+        self.synthesis["fault_feedstock_items_count"] = len(self.report)
 
-
-
-        # return self.faltas
         return self.save_to_json()
 
     def get_production_orders_to_analyze_list(self):
@@ -362,18 +359,18 @@ class App(object):
                 return o.__str__()
 
         with open("relatorio.json", "w") as json_file:
-            json.dump(self.faltas, json_file, default=myconverter)
+            json.dump(self.report, json_file, default=myconverter)
 
         final = datetime.now()
 
         tempo = final - start_time
 
         print("\n\nForam identificados {} itens com faltas iminentes.".format(
-            str(len(self.faltas))))
+            str(len(self.report))))
         print("\n\n⏱ Tempo decorrido: {}\n\n".format(str(tempo)))
         print("*** 😁 FIM 😁 ***")
 
-        return json.dumps(self.faltas, default=myconverter, indent=2)
+        return json.dumps(self.report, default=myconverter, indent=2)
 
     def timeline(self, CPD_MP):
         # Define o horizonte de programação para o item em análise
@@ -475,7 +472,7 @@ class App(object):
                 dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
                 dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
 
-                self.synthesis["total_cost_of_actions"] += dados["custo_acao"], 2
+                self.synthesis["total_cost_of_actions"] += self.ocs_antecipar["VALOR_TOTAL"].sum()
 
             else:
                 dados["acao_sugerida"] = "Comprar"
@@ -489,7 +486,7 @@ class App(object):
             dados["relatorio"] = self.ops_falta.reset_index().to_dict(
                 orient="records")
 
-            self.faltas[CPD_MP] = dados
+            self.report[CPD_MP] = dados
 
     def check_purchases(self, CPD_MP, data_primeira_falta):
         return self.open_purchase_orders[self.open_purchase_orders["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()

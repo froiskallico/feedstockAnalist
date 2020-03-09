@@ -33,9 +33,9 @@
                         <td>{{ analyze.synthesis.fault_feedstock_items_count }}</td>
                         <td>R$ {{ analyze.synthesis.total_cost_of_actions|floatformat:2 }}</td>
                         <td>
-                            <button type="button" class="btn btn-outline-dark">
+                            <a href="{{ analyze.id }}" type="button" class="btn btn-outline-dark">
                                 Abrir
-                            </button>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}
