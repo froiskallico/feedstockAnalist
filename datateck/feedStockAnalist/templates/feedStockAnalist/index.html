@@ -1,7 +1,7 @@
 {% extends 'feedStockAnalist/base.html' %}
 
 {% block content %}
-<section class="container half-opacity rounded p-2 m-auto mx-2 col-sm-10">
+<div class="container half-opacity rounded p-2 m-auto mx-2 col-sm-10">
     <header class="row p-5 w-100">
         <h4 class="text-white float-left col-sm-9">Últimas análises</h4>
         <a href="/new/" type="button" class="btn btn-success col-sm-3 float-right">
@@ -9,48 +9,50 @@
         </a>
     </header>
 
-    {% if analysis_list %}
-    <div class="card m-3">
-        <div class="table-responsive">
-            <table class="table-light table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>OP</<th>
-                        <th>Data da Análise</th>
-                        <th>Quantidade de Itens</th>
-                        <th>Itens com falta</th>
-                        <th>Custo das Ações</th>
-                        <th>Abrir</th>
-                    </tr>
-                </thead>
-                <tbody class='text-dark rounded'>
-                    {% for analyze in analysis_list %}
-                    <tr>
-                        <td scope="row">{{ analyze.synthesis.production_orders_to_analyze_list }}</td>
-                        <td>{{ analyze.created_at }}</td>
-                        <td>{{ analyze.synthesis.feedstock_items_count }}</td>
-                        <!-- TODO: Here load and parse analyze.report fieldsa -->
-                        <td>{{ analyze.synthesis.fault_feedstock_items_count }}</td>
-                        <td>R$ {{ analyze.synthesis.total_cost_of_actions|floatformat:2 }}</td>
-                        <td>
-                            <a href="{{ analyze.id }}" type="button" class="btn btn-outline-dark">
-                                Abrir
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <section>
+        {% if analysis_list %}
+        <div class="card m-3">
+            <div class="table-responsive">
+                <table class="table-light table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>OP</<th>
+                            <th>Data da Análise</th>
+                            <th>Quantidade de Itens</th>
+                            <th>Itens com falta</th>
+                            <th>Custo das Ações</th>
+                            <th>Abrir</th>
+                        </tr>
+                    </thead>
+                    <tbody class='text-dark rounded'>
+                        {% for analyze in analysis_list %}
+                        <tr>
+                            <td scope="row">{{ analyze.synthesis.production_orders_to_analyze_list }}</td>
+                            <td>{{ analyze.created_at }}</td>
+                            <td>{{ analyze.synthesis.feedstock_items_count }}</td>
+                            <!-- TODO: Here load and parse analyze.report fieldsa -->
+                            <td>{{ analyze.synthesis.fault_feedstock_items_count }}</td>
+                            <td>R$ {{ analyze.synthesis.total_cost_of_actions|floatformat:2 }}</td>
+                            <td>
+                                <a href="{{ analyze.id }}" type="button" class="btn btn-outline-dark">
+                                    Abrir
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card text-white half-opacity text-center col-sm-5 mx-auto">
+                <div class="card-body">
+                    <h4 class="card-title">Nenhum análise ainda</h4>
+                    <p class="card-text">Clique em nova análise para começar</p>
+                </div>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div class="card text-white half-opacity text-center col-sm-5 mx-auto">
-          <div class="card-body">
-            <h4 class="card-title">Nenhum análise ainda</h4>
-            <p class="card-text">Clique em nova análise para começar</p>
-          </div>
-        </div>
-        {% endif %}
-    </div>
+    </section>
 
-</section>
+</div>
 {% endblock %}

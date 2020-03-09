@@ -2,59 +2,85 @@
 
 {% block content %}
 <div class="jumbotron jumbotron-fluid col-12 half-opacity text-light p-3">
-    <div class="container-fluid">
-        <h1 class="display-4">OP{% if ',' in synthesis.production_orders_to_analyze_list %}S{% endif %}: {{ synthesis.production_orders_to_analyze_list }}</h1>
-        <p class="lead">Resumo da análise:</p>
-        <div class="row rounded bg-light text-center text-dark">
-            <div class="col-sm">
-                <p class="my-auto font-weight-bold">Itens analisados</p>
-                <p class="my-auto">{{ synthesis.feedstock_items_count }}</p>
+    <header>
+        <div class="container-fluid">
+            <h1 class="display-4">OP{% if ',' in synthesis.production_orders_to_analyze_list %}S{% endif %}:
+                {{ synthesis.production_orders_to_analyze_list }}</h1>
+            <p class="lead">Resumo da análise:</p>
+            <div class="row rounded bg-light text-center text-dark">
+                <div class="col-sm">
+                    <p class="my-auto font-weight-bold">Itens analisados</p>
+                    <p class="my-auto">{{ synthesis.feedstock_items_count }}</p>
+                </div>
+                <div class="col-sm" style="background-color: #e0e0e0;">
+                    <p class="my-auto font-weight-bold">Itens com falta iminente</p>
+                    <p class="my-auto">{{ synthesis.fault_feedstock_items_count }}</p>
+                </div>
+                <div class="col-sm">
+                    <p class="my-auto font-weight-bold">Custo total das ações sugeridas</p>
+                    <p class="my-auto">R$ {{ synthesis.total_cost_of_actions|floatformat:2  }}</p>
+                </div>
             </div>
-            <div class="col-sm" style="background-color: #e0e0e0;">
-                <p class="my-auto font-weight-bold">Itens com falta iminente</p>
-                <p class="my-auto">{{ synthesis.fault_feedstock_items_count }}</p>
-            </div>
-            <div class="col-sm">
-                <p class="my-auto font-weight-bold">Custo total das ações sugeridas</p>
-                <p class="my-auto">R$ {{ synthesis.total_cost_of_actions|floatformat:2  }}</p>
+
+        </div>
+        <hr class="hr-light" />
+        {% if report %}
+        <p class="lead">Itens com falta iminente:</p>
+    </header>
+
+    <section>
+        {% for key, value in report.items %}
+        <div class="card half-opacity text-light mb-1">
+            <div class="card-body">
+                <h4 class="card-title">CPD: {{ key|floatformat:"0" }}</h4>
+                <div class="row text-center text-light mx-2 rounded">
+                    <div class="col-sm rounded mx-1" style="background-color: #444;">
+                        <p class="my-auto font-weight-bold">Quantidade que faltará</p>
+                        <p class="my-auto">{{ value.quantidade_falta|floatformat:"0" }} pçs</p>
+                    </div>
+                    <div class="col-sm rounded mx-1" style="background-color: #333;">
+                        <p class="my-auto font-weight-bold">Ação sugerida</p>
+                        <p class="my-auto">{{ value.acao_sugerida }}</p>
+                    </div>
+                    <div class="col-sm rounded mx-1" style="background-color: #444;">
+                        <p class="my-auto font-weight-bold">Custo da Ação Sugerida</p>
+                        <p class="my-auto">R$ {{ value.custo_acao|floatformat:2  }}</p>
+                    </div>
+                </div>
+
+                {{ value.keys }}
             </div>
         </div>
+        {% endfor %}
+        {% else %}
+        <div class="text-center">
+            <h2>Parabéns!</h2>
+            <img class="m-3"
+                src="https://media3.giphy.com/media/iUOzkJmvnFfqM/giphy.gif?cid=790b76118e457e61fa523a9b4a80dbbf4e3a8a6c13c64e2a&rid=giphy.gif"
+                alt="">
+            <p>Não foi encontrada nenhuma falta!</p>
+        </div>
+        {% endif %}
+    </section>
 
-    </div>
-    <hr class="hr-light" />
-    {% if report %}
-    <p class="lead">Itens com falta iminente:</p>
-
-    {% for key, value in report.items %}
-    <div class="card half-opacity text-light mb-1">
-        <div class="card-body">
-            <h4 class="card-title">CPD: {{ key|floatformat:"0" }}</h4>
-            <div class="row text-center text-light mx-2 rounded">
-                <div class="col-sm rounded mx-1"  style="background-color: #444;">
-                    <p class="my-auto font-weight-bold">Quantidade que faltará</p>
-                    <p class="my-auto">{{ value.quantidade_falta|floatformat:"0" }} pçs</p>
-                </div>
-                <div class="col-sm rounded mx-1" style="background-color: #333;">
-                    <p class="my-auto font-weight-bold">Ação sugerida</p>
-                    <p class="my-auto">{{ value.acao_sugerida }}</p>
-                </div>
-                <div class="col-sm rounded mx-1"  style="background-color: #444;">
-                    <p class="my-auto font-weight-bold">Custo da Ação Sugerida</p>
-                    <p class="my-auto">R$ {{ value.custo_acao|floatformat:2  }}</p>
+    {% for key in report %}
+    <div id="reportAccordian" role="tablist" aria-multiselectable="true">
+        <div class="card">
+            <div class="card-header" role="tab" id="section{{ forloop.counter }}HeaderId">
+                <h5 class="mb-0">
+                    <a data-toggle="collapse" data-parent="#reportAccordian" href="#section{{ forloop.counter }}ContentId" aria-expanded="true" aria-controls="section{{ forloop.counter }}ContentId">
+              CPD_DO_ITEM
+            </a>
+                </h5>
+            </div>
+            <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel" aria-labelledby="section{{ forloop.counter }}HeaderId">
+                <div class="card-body">
+                    DADOS_DO_ITEM
                 </div>
             </div>
-
-            {{ value.keys }}
         </div>
     </div>
     {% endfor %}
-    {% else %}
-    <div class="text-center">
-        <h2>Parabéns!</h2>
-        <img class="m-3" src="https://media3.giphy.com/media/iUOzkJmvnFfqM/giphy.gif?cid=790b76118e457e61fa523a9b4a80dbbf4e3a8a6c13c64e2a&rid=giphy.gif" alt="">
-        <p>Não foi encontrada nenhuma falta!</p>
-    </div>
-    {% endif %}
 
 </div>
 {% endblock %}
