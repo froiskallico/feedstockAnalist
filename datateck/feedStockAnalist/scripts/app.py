@@ -475,7 +475,7 @@ class App(object):
                 dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
                 dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
 
-                self.synthesis["total_cost_of_actions"] += fixed(dados["custo_acao"], 2)
+                self.synthesis["total_cost_of_actions"] += dados["custo_acao"], 2
 
             else:
                 dados["acao_sugerida"] = "Comprar"

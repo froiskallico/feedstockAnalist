@@ -7,6 +7,17 @@ body {
     background-size: cover;
     -o-background-size: cover;
 }
+
 .half-opacity {
     background-color: rgba(40, 40, 40, .60);
+}
+
+.loading-img {
+    border-radius: 8px;
+    max-width: 200px;
+
+}
+
+.brand-img {
+    max-height: 48px;
 }
