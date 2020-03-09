@@ -29,29 +29,42 @@
     </header>
 
     <section>
-        {% for key, value in report.items %}
-        <div class="card half-opacity text-light mb-1">
-            <div class="card-body">
-                <h4 class="card-title">CPD: {{ key|floatformat:"0" }}</h4>
-                <div class="row text-center text-light mx-2 rounded">
-                    <div class="col-sm rounded mx-1" style="background-color: #444;">
-                        <p class="my-auto font-weight-bold">Quantidade que faltará</p>
-                        <p class="my-auto">{{ value.quantidade_falta|floatformat:"0" }} pçs</p>
-                    </div>
-                    <div class="col-sm rounded mx-1" style="background-color: #333;">
-                        <p class="my-auto font-weight-bold">Ação sugerida</p>
-                        <p class="my-auto">{{ value.acao_sugerida }}</p>
-                    </div>
-                    <div class="col-sm rounded mx-1" style="background-color: #444;">
-                        <p class="my-auto font-weight-bold">Custo da Ação Sugerida</p>
-                        <p class="my-auto">R$ {{ value.custo_acao|floatformat:2  }}</p>
+        <div id="reportAccordian" role="tablist" aria-multiselectable="true">
+            {% for key, value in report.items %}
+            <div class="card half-opacity text-light mb-1">
+                <div class="card-header role=" tab" id="section{{ forloop.counter }}HeaderId">
+                    <h5 class="mb-0">
+                        <a class="text-light" data-toggle="collapse" data-parent="#reportAccordian"
+                            href="#section{{ forloop.counter }}ContentId" aria-expanded="true"
+                            aria-controls="section{{ forloop.counter }}ContentId">
+                            CPD: {{ key|floatformat:"0" }} 📂
+                        </a>
+                    </h5>
+                </div>
+                <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel"
+                    aria-labelledby="section{{ forloop.counter }}HeaderId">
+                    <div class="card-body">
+                        <div class="row text-center text-light mx-2 rounded">
+                            <div class="col-sm rounded mx-1" style="background-color: #444;">
+                                <p class="my-auto font-weight-bold">Quantidade que faltará</p>
+                                <p class="my-auto">{{ value.quantidade_falta|floatformat:"0" }} pçs</p>
+                            </div>
+                            <div class="col-sm rounded mx-1" style="background-color: #333;">
+                                <p class="my-auto font-weight-bold">Ação sugerida</p>
+                                <p class="my-auto">{{ value.acao_sugerida }}</p>
+                            </div>
+                            <div class="col-sm rounded mx-1" style="background-color: #444;">
+                                <p class="my-auto font-weight-bold">Custo da Ação Sugerida</p>
+                                <p class="my-auto">R$ {{ value.custo_acao|floatformat:2  }}</p>
+                            </div>
+                        </div>
+
+                        {{ value.keys }}
                     </div>
                 </div>
-
-                {{ value.keys }}
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
         {% else %}
         <div class="text-center">
             <h2>Parabéns!</h2>
@@ -63,24 +76,9 @@
         {% endif %}
     </section>
 
-    {% for key in report %}
-    <div id="reportAccordian" role="tablist" aria-multiselectable="true">
-        <div class="card">
-            <div class="card-header" role="tab" id="section{{ forloop.counter }}HeaderId">
-                <h5 class="mb-0">
-                    <a data-toggle="collapse" data-parent="#reportAccordian" href="#section{{ forloop.counter }}ContentId" aria-expanded="true" aria-controls="section{{ forloop.counter }}ContentId">
-              CPD_DO_ITEM
-            </a>
-                </h5>
-            </div>
-            <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel" aria-labelledby="section{{ forloop.counter }}HeaderId">
-                <div class="card-body">
-                    DADOS_DO_ITEM
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
+
+
+
 
 </div>
 {% endblock %}
