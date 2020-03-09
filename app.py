@@ -13,6 +13,8 @@ pd.options.mode.chained_assignment = None
 class App(object):
 
     def __init__(self, csv=False, lista_ops=None):
+        self.dici = dict()
+        self.dici["CUSTO"] = 0
         self.csv = csv
         self.lista_ops = lista_ops
 
@@ -423,11 +425,19 @@ class App(object):
 
             if len(self.ocs_futuras) > 0:
                 dados["acao_sugerida"] = "Antecipar"
-                self.ocs_antecipar = self.ocs_futuras.set_index("ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"]>= total_falta].iloc[0]["ENTREGA"]].reset_index()
+                try:
+                    self.ocs_antecipar = self.ocs_futuras.set_index("ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"]>= total_falta].iloc[0]["ENTREGA"]].reset_index()
+                except:
+                    pass
                 dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(orient="records")
                 dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(orient="records")
                 dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
                 dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
+
+                print(self.ocs_antecipar["VALOR_TOTAL"].sum())
+
+                self.dici["CUSTO"] += self.ocs_antecipar["VALOR_TOTAL"].sum()
+                print(self.dici)
 
             else:
                 dados["acao_sugerida"] = "Comprar"
@@ -444,3 +454,6 @@ class App(object):
 
     def check_purchases(self, CPD_MP, data_primeira_falta):
         return self.ocs_pendentes[self.ocs_pendentes["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()
+
+
+App(True, 114562).analist()

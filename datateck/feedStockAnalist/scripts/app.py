@@ -48,6 +48,8 @@ class App(object):
 
         self.faltas = dict()
 
+        self.synthesis["total_cost_of_actions"] = 0
+
         for cpd in self.CPDs:
             self.timeline(CPD_MP=cpd)
 
@@ -436,8 +438,6 @@ class App(object):
         # Checa se haverá falta em alguma data na TL
         havera_falta = len(self.tl[self.tl["FALTA"] == True])
 
-        self.synthesis["total_cost_of_actions"] = 0
-
         # Se houver falta na TL, verificar as datas e OPs em que havera e registrar no relatorio de faltas
         if havera_falta:
             dados = dict()
@@ -475,7 +475,7 @@ class App(object):
                 dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
                 dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
 
-                self.synthesis["total_cost_of_actions"] += int(self.ocs_antecipar["VALOR_TOTAL"].sum())
+                self.synthesis["total_cost_of_actions"] += fixed(dados["custo_acao"], 2)
 
             else:
                 dados["acao_sugerida"] = "Comprar"
