@@ -61,8 +61,8 @@
                             </div>
                         </div>
 
-                        <div class="container container-fluid row mt-4" id="detail-reports-nav-pills">
-                            <div class="nav flex-column col-2 nav-pills" id="v-pills-tab" role="tablist"
+                        <div class="row my-4 mx-2" id="detail-reports-nav-pills">
+                            <div class="nav flex-column col-sm-2 nav-pills" id="v-pills-tab" role="tablist"
                                 aria-orientation="vertical">
                                 <a class="nav-link active" id="v-pills-timeline{{ forloop.counter }}-tab"
                                     data-toggle="pill" href="#v-pills-timeline{{ forloop.counter }}" role="tab"
@@ -75,43 +75,118 @@
                                 <a class="nav-link" id="v-pills-pending-purchase-orders{{ forloop.counter }}-tab"
                                     data-toggle="pill" href="#v-pills-pending-purchase-orders{{ forloop.counter }}"
                                     role="tab" aria-controls="v-pills-pending-purchase-orders{{ forloop.counter }}"
-                                    aria-selected="false">Ordens de Compra Pendentes</a>
+                                    aria-selected="false">Orde{{ value.ocs_futuras|length|pluralize:"m,ns" }} de Compra Pendente{{ value.ocs_futuras|length|pluralize }}</a>
                                 <a class="nav-link" id="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}-tab"
                                     data-toggle="pill"
                                     href="#v-pills-purchase-orders-to-anticipate{{ forloop.counter }}" role="tab"
                                     aria-controls="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}"
-                                    aria-selected="false">OCs para Antecipar</a>
+                                    aria-selected="false">OC{{ value.ocs_para_antecipar|length|pluralize }} Para Antecipar</a>
                             </div>
 
-                            <div class="tab-content col-10" id="v-pills-tabContent">
+                            <div class="tab-content col-sm-10" id="v-pills-tabContent">
                                 <div class="tab-pane fade show active" id="v-pills-timeline{{ forloop.counter }}"
                                     role="tabpanel" aria-labelledby="v-pills-timeline{{ forloop.counter }}-tab">
-                                    <h4>AQUI A TIMELINE</h4>
+                                    <p>
+                                        timeline aqui
+                                    </p>
                                 </div>
                                 <div class="tab-pane fade" id="v-pills-production-orders{{ forloop.counter }}"
                                     role="tabpanel"
                                     aria-labelledby="v-pills-production-orders{{ forloop.counter }}-tab">
-                                    <h3>Relatório de OPS que haverão faltas</h3>
-                                    {{ value.relatorio }}
+                                    <h5>Relatório de OP{{ value.relatorio|length|pluralize }} que haver{{ value.relatorio|length|pluralize:"á,ão" }} falta{{ value.relatorio|length|pluralize }}</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped table-hover">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>Data Entrega</th>
+                                                    <th>Chicote</th>
+                                                    <th>OP</th>
+                                                    <th>Cliente</th>
+                                                    <th>Comprometido</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for op in value.relatorio %}
+                                                <tr>
+                                                    <td scope="row">{{ op.ENTREGA|slice:":10" }}</td>
+                                                    <td>{{ op.CODIGO_CHICOTE }}</td>
+                                                    <td>{{ op.OP|floatformat:"0" }}</td>
+                                                    <td>{{ op.CLIENTE }}</td>
+                                                    <td>{{ op.COMPROMETIDO|floatformat:"0" }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div class="tab-pane fade" id="v-pills-pending-purchase-orders{{ forloop.counter }}"
                                     role="tabpanel"
                                     aria-labelledby="v-pills-pending-purchase-orders{{ forloop.counter }}">
-                                    <h3>OCs futuras</h3>
-                                    {{ value.ocs_futuras }}
+                                    <h5>OC{{ value.ocs_futuras|length|pluralize }} futura{{ value.ocs_futuras|length|pluralize }}</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped table-hover">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>Data Entrega</th>
+                                                    <th>OC</th>
+                                                    <th>Fornecedor</th>
+                                                    <th>Qtd. Pedente</th>
+                                                    <th>Moeda</th>
+                                                    <th>Valor OC</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for oc in value.ocs_futuras %}
+                                                <tr>
+                                                    <td scope="row">{{ oc.ENTREGA|slice:":10" }}</td>
+                                                    <td>{{ oc.OC|floatformat:"0" }}</td>
+                                                    <td>{{ oc.FORNECEDOR }}</td>
+                                                    <td>{{ oc.QTD_PENDENTE_OC|floatformat:"0" }}</td>
+                                                    <td>{{ oc.SIMBOLO }}</td>
+                                                    <td>{{ oc.VALOR_TOTAL|floatformat:2 }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div class="tab-pane fade"
                                     id="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}" role="tabpanel"
                                     aria-labelledby="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}">
-                                    <h3>Para Antecipar</h3>
-                                    <p>{{ value.ocs_para_antecipar }}</p>
+                                    <h5>OC{{ value.ocs_para_antecipar|length|pluralize }} Para Antecipar</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped table-hover">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>Data Entrega</th>
+                                                    <th>OC</th>
+                                                    <th>Fornecedor</th>
+                                                    <th>Qtd. Pedente</th>
+                                                    <th>Moeda</th>
+                                                    <th>Valor OC</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for oc in value.ocs_para_antecipar %}
+                                                <tr>
+                                                    <td scope="row">{{ oc.ENTREGA|slice:":10" }}</td>
+                                                    <td>{{ oc.OC|floatformat:"0" }}</td>
+                                                    <td>{{ oc.FORNECEDOR }}</td>
+                                                    <td>{{ oc.QTD_PENDENTE_OC|floatformat:"0" }}</td>
+                                                    <td>{{ oc.SIMBOLO }}</td>
+                                                    <td>{{ oc.VALOR_TOTAL|floatformat:2 }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
 
             {% else %}
 

@@ -12,6 +12,7 @@ import json
 class IndexView(generic.ListView):
     template_name = 'feedStockAnalist/index.html'
     context_object_name = 'analysis_list'
+    paginate_by = 2
 
     def get_queryset(self):
         analysis_from_db = Analysis.objects.all()
