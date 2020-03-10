@@ -460,6 +460,9 @@ class App(object):
             self.ocs_futuras.loc[:,
                                  "ACUMULADO_OCS"] = self.ocs_futuras["QTD_PENDENTE_OC"].cumsum()
 
+            dados["moeda"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "SIMBOLO"].iloc[0]
+            dados["custo_unit"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0]
+
             if len(self.ocs_futuras) > 0:
                 dados["acao_sugerida"] = "Antecipar"
                 # TODO: Here calculate the anticipation and if it have unless the necessary to cover the total fault, throw an "purchase" action too
@@ -494,8 +497,6 @@ class App(object):
             else:
                 dados["acao_sugerida"] = "Comprar"
                 dados["quantidade_comprar"] = total_falta
-                dados["moeda"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "SIMBOLO"].iloc[0]
-                dados["custo_unit"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0]
                 dados["custo_acao_comprar"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0] * dados["quantidade_comprar"]
                 self.synthesis["total_cost_of_actions"] += dados["custo_acao_comprar"]
 

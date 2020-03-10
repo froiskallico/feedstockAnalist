@@ -56,10 +56,18 @@
                                 <p class="my-auto font-weight-bold">Ação sugerida</p>
                                 <p class="my-auto">{{ value.acao_sugerida }}</p>
                             </div>
+                            {% if value.custo_acao_antecipar > 0 %}
                             <div class="col-sm rounded mx-1" style="background-color: #444;">
-                                <p class="my-auto font-weight-bold">Custo da Ação Sugerida</p>
+                                <p class="my-auto font-weight-bold">Custo das Antecipações</p>
                                 <p class="my-auto">{{ value.moeda }} {{ value.custo_acao_antecipar|floatformat:2  }}</p>
                             </div>
+                            {% endif %}
+                            {% if value.custo_acao_comprar > 0 %}
+                            <div class="col-sm rounded mx-1" style="background-color: #444;">
+                                <p class="my-auto font-weight-bold">Custo das Compras</p>
+                                <p class="my-auto">{{ value.moeda }} {{ value.custo_acao_comprar|floatformat:2  }}</p>
+                            </div>
+                            {% endif %}
                         </div>
 
                         <div class="row my-4 mx-2" id="detail-reports-nav-pills">
@@ -73,21 +81,27 @@
                                     data-toggle="pill" href="#v-pills-production-orders{{ forloop.counter }}" role="tab"
                                     aria-controls="v-pills-production-orders{{ forloop.counter }}"
                                     aria-selected="false">OPs Faltantes</a>
+                                {% if value.ocs_futuras %}
                                 <a class="nav-link" id="v-pills-pending-purchase-orders{{ forloop.counter }}-tab"
                                     data-toggle="pill" href="#v-pills-pending-purchase-orders{{ forloop.counter }}"
                                     role="tab" aria-controls="v-pills-pending-purchase-orders{{ forloop.counter }}"
                                     aria-selected="false">Orde{{ value.ocs_futuras|length|pluralize:"m,ns" }} de Compra
                                     Pendente{{ value.ocs_futuras|length|pluralize }}</a>
+                                {% endif %}
+                                {% if value.ocs_para_antecipar %}
                                 <a class="nav-link" id="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}-tab"
                                     data-toggle="pill"
                                     href="#v-pills-purchase-orders-to-anticipate{{ forloop.counter }}" role="tab"
                                     aria-controls="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}"
                                     aria-selected="false">OC{{ value.ocs_para_antecipar|length|pluralize }} Para
                                     Antecipar</a>
+                                {% endif %}
+                                {% if value.quantidade_comprar > 0 %}
                                 <a class="nav-link" id="v-pills-purchase-action{{ forloop.counter }}-tab"
                                     data-toggle="pill" href="#v-pills-purchase-action{{ forloop.counter }}" role="tab"
                                     aria-controls="v-pills-purchase-action{{ forloop.counter }}"
                                     aria-selected="false">Comprar...</a>
+                                {% endif %}
                             </div>
 
                             <div class="tab-content col-sm-10" id="v-pills-tabContent">
@@ -217,7 +231,7 @@
                                     role="tabpanel" aria-labelledby="v-pills-purchase-action{{ forloop.counter }}">
                                     <h3>Comprar:</h3>
                                     <h5>Quantidade a comprar: {{ value.quantidade_comprar|floatformat:"0" }} pçs</h5>
-                                    <h5>Custo da ação comprar: {{ value.custo_acao_comprar|floatformat:2 }}</h5>
+                                    <h5>Custo da ação comprar: {{ value.moeda }} {{ value.custo_acao_comprar|floatformat:2 }}</h5>
                                 </div>
                             </div>
                         </div>
