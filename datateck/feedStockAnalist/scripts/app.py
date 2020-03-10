@@ -150,26 +150,29 @@ class App(object):
 
         def fetch_data_from_database():
             return pd.read_sql(
-                """
-                SELECT DISTINCT
-                    MP.PK_PRO CPD_MP,
-                    MP.COD_FABRIC CODIGO_MP,
-                    MP.DESC_COMPL DESCRICAO_MP,
-                    (SELECT DESCRICAO FROM SUBGRUPOS WHERE PK_SGR = MP.FK_SGR) SUBGRUPO,
-                    COALESCE(MP.QUANTIDADE, 0) ESTOQUE,
-                    COALESCE(MP.QTD_LINHA, 0) ESTOQUE_LP,
-                    COALESCE(MP.QTD_CORTE, 0) ESTOQUE_CORTE,
-                    COALESCE(MP.PERC_ESTOQUE_LP, 0) PERC_ESTOQUE_LP,
-                    COALESCE(MP.PERC_ESTOQUE_CORTE, 0) PERC_ESTOQUE_CORTE,
-                    MP.HORIZONTE_PROGRAMACAO
+            """
+            SELECT DISTINCT
+                MP.PK_PRO CPD_MP,
+                MP.COD_FABRIC CODIGO_MP,
+                MP.DESC_COMPL DESCRICAO_MP,
+                (SELECT DESCRICAO FROM SUBGRUPOS WHERE PK_SGR = MP.FK_SGR) SUBGRUPO,
+                COALESCE(MP.QUANTIDADE, 0) ESTOQUE,
+                COALESCE(MP.QTD_LINHA, 0) ESTOQUE_LP,
+                COALESCE(MP.QTD_CORTE, 0) ESTOQUE_CORTE,
+                COALESCE(MP.PERC_ESTOQUE_LP, 0) PERC_ESTOQUE_LP,
+                COALESCE(MP.PERC_ESTOQUE_CORTE, 0) PERC_ESTOQUE_CORTE,
+                MP.HORIZONTE_PROGRAMACAO,
+                MP.PREC_COMPR CUSTO_MP,
+                MOE.SIMBOLO SIMBOLO
 
-                FROM
-                    FIC_TEC FIC
-                    JOIN PRODUTOS MP ON MP.PK_PRO = FIC.FK_PRO
-                    JOIN ITE_OSE ISE ON ISE.FK_PRO = FIC.FK_PROACAB
+            FROM
+                FIC_TEC FIC
+                JOIN PRODUTOS MP ON MP.PK_PRO = FIC.FK_PRO
+                JOIN ITE_OSE ISE ON ISE.FK_PRO = FIC.FK_PROACAB
+                JOIN MOEDAS MOE ON MOE.PK_MOE = MP.FK_MOE
 
-                WHERE
-                    ISE.FK_OSE IN ({})
+            WHERE
+                ISE.FK_OSE IN ({})
             """.format(self.production_orders_to_analyze_list),
                 self.db.connection
             )
@@ -439,6 +442,8 @@ class App(object):
         if havera_falta:
             dados = dict()
 
+            dados["timeline"] = self.tl.reset_index().to_dict(orient="records")
+
             # Define as datas em que haverá falta de MP
             self.datas_falta = self.tl[self.tl["FALTA"]][["ENTREGA", "CPD_MP"]]
 
@@ -462,20 +467,37 @@ class App(object):
                     self.ocs_antecipar = self.ocs_futuras.set_index(
                         "ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"] >= total_falta].iloc[0]["ENTREGA"]].reset_index()
                 except:
-                    dados["acao_sugerida"] = "Comprar"
+                    self.ocs_antecipar = self.ocs_futuras.reset_index()
+                    dados["acao_sugerida"] = "Antecipar/Comprar"
                     return
+
+                dados["quantidade_antecipar"] = self.ocs_futuras["QTD_PENDENTE_OC"].sum()
+                dados["quantidade_comprar"] = total_falta - dados["quantidade_antecipar"]
 
                 dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(
                     orient="records")
                 dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(
                     orient="records")
-                dados["moeda"] = self.ocs_antecipar.loc[0, "SIMBOLO"]
-                dados["custo_acao"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
 
-                self.synthesis["total_cost_of_actions"] += self.ocs_antecipar["VALOR_TOTAL"].sum()
+                dados["moeda"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "SIMBOLO"].iloc[0]
+                dados["custo_acao_antecipar"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
+
+                self.synthesis["total_cost_of_actions"] += dados["custo_acao_antecipar"]
+
+                if dados["quantidade_comprar"] > 0:
+                    dados["custo_acao_comprar"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0] * dados["quantidade_comprar"]
+                    self.synthesis["total_cost_of_actions"] += dados["custo_acao_comprar"]
+                else:
+                    dados["quantidade_comprar"] = 0
+                    dados["custo_acao_comprar"] = 0
 
             else:
                 dados["acao_sugerida"] = "Comprar"
+                dados["quantidade_comprar"] = total_falta
+                dados["moeda"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "SIMBOLO"].iloc[0]
+                dados["custo_unit"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0]
+                dados["custo_acao_comprar"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0] * dados["quantidade_comprar"]
+                self.synthesis["total_cost_of_actions"] += dados["custo_acao_comprar"]
 
                 # Calcular Média de Vendas MRP
                 # Calcular Estoque Máximo MRP
@@ -490,3 +512,8 @@ class App(object):
 
     def check_purchases(self, CPD_MP, data_primeira_falta):
         return self.open_purchase_orders[self.open_purchase_orders["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()
+
+
+a = App()
+
+# %%

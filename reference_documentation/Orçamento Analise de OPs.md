@@ -22,7 +22,7 @@ Sistema que faça a análise de necessidades de matérias primas em uma ou mais 
       - [ ] Alertar o usuário se a sugestão ultrapassar o estoque máximo.
   - [ ] **Alerta** de Lead Time (*Se a necessidade for para um prazo menor que o Lead Time, indicando necessidade de ação emergencial*).
 - [ ] Calcular o valor financeiro das compras sugeridas, por item e total da análise;
-- [ ] As análises ficarão registradas em banco de dados, com os dados do momento em que foram feitas (Foto da análise);
+- [x] As análises ficarão registradas em banco de dados, com os dados do momento em que foram feitas (Foto da análise);
 - [ ] Exportação da análise para excel;
 - [ ] Exportação das sugestões de compras para posterior importação no Delphus;
 - [ ] No sistema existirá a opção de rodar a mesma análise para os itens do Radar de Compras.

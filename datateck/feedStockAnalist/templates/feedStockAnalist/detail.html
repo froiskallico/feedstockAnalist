@@ -45,6 +45,7 @@
 
                 <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel"
                     aria-labelledby="section{{ forloop.counter }}HeaderId">
+
                     <div class="card-body">
                         <div class="row text-center text-light mx-2 rounded">
                             <div class="col-sm rounded mx-1" style="background-color: #444;">
@@ -57,7 +58,7 @@
                             </div>
                             <div class="col-sm rounded mx-1" style="background-color: #444;">
                                 <p class="my-auto font-weight-bold">Custo da Ação Sugerida</p>
-                                <p class="my-auto">{{ value.moeda }} {{ value.custo_acao|floatformat:2  }}</p>
+                                <p class="my-auto">{{ value.moeda }} {{ value.custo_acao_antecipar|floatformat:2  }}</p>
                             </div>
                         </div>
 
@@ -75,25 +76,55 @@
                                 <a class="nav-link" id="v-pills-pending-purchase-orders{{ forloop.counter }}-tab"
                                     data-toggle="pill" href="#v-pills-pending-purchase-orders{{ forloop.counter }}"
                                     role="tab" aria-controls="v-pills-pending-purchase-orders{{ forloop.counter }}"
-                                    aria-selected="false">Orde{{ value.ocs_futuras|length|pluralize:"m,ns" }} de Compra Pendente{{ value.ocs_futuras|length|pluralize }}</a>
+                                    aria-selected="false">Orde{{ value.ocs_futuras|length|pluralize:"m,ns" }} de Compra
+                                    Pendente{{ value.ocs_futuras|length|pluralize }}</a>
                                 <a class="nav-link" id="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}-tab"
                                     data-toggle="pill"
                                     href="#v-pills-purchase-orders-to-anticipate{{ forloop.counter }}" role="tab"
                                     aria-controls="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}"
-                                    aria-selected="false">OC{{ value.ocs_para_antecipar|length|pluralize }} Para Antecipar</a>
+                                    aria-selected="false">OC{{ value.ocs_para_antecipar|length|pluralize }} Para
+                                    Antecipar</a>
+                                <a class="nav-link" id="v-pills-purchase-action{{ forloop.counter }}-tab"
+                                    data-toggle="pill" href="#v-pills-purchase-action{{ forloop.counter }}" role="tab"
+                                    aria-controls="v-pills-purchase-action{{ forloop.counter }}"
+                                    aria-selected="false">Comprar...</a>
                             </div>
 
                             <div class="tab-content col-sm-10" id="v-pills-tabContent">
                                 <div class="tab-pane fade show active" id="v-pills-timeline{{ forloop.counter }}"
                                     role="tabpanel" aria-labelledby="v-pills-timeline{{ forloop.counter }}-tab">
-                                    <p>
-                                        timeline aqui
-                                    </p>
+                                    <h5>Linha do tempo:</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped table-hover">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>Data Entrega</th>
+                                                    <th>Saldo Inicial</th>
+                                                    <th>Quantidade OC</th>
+                                                    <th>Comprometido</th>
+                                                    <th>Saldo Final</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for line in value.timeline %}
+                                                <tr {% if line.FALTA %}style="box-shadow: rgba(255, 0, 0, 0.40) 0 0 0 100px inset;"{% endif %}>
+                                                    <td scope="row">{{ line.ENTREGA|slice:":10" }}</td>
+                                                    <td>{{ line.SALDO_INICIAL|floatformat:"0" }}</td>
+                                                    <td>{{ line.QTD_PENDENTE_OC|floatformat:"0" }}</td>
+                                                    <td>{{ line.COMPROMETIDO|floatformat:"0" }}</td>
+                                                    <td>{{ line.SALDO_FINAL|floatformat:"0" }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div class="tab-pane fade" id="v-pills-production-orders{{ forloop.counter }}"
                                     role="tabpanel"
                                     aria-labelledby="v-pills-production-orders{{ forloop.counter }}-tab">
-                                    <h5>Relatório de OP{{ value.relatorio|length|pluralize }} que haver{{ value.relatorio|length|pluralize:"á,ão" }} falta{{ value.relatorio|length|pluralize }}</h5>
+                                    <h5>Relatório de OP{{ value.relatorio|length|pluralize }} que
+                                        haver{{ value.relatorio|length|pluralize:"á,ão" }}
+                                        falta{{ value.relatorio|length|pluralize }}</h5>
                                     <div class="table-responsive">
                                         <table class="table table-dark table-striped table-hover">
                                             <thead class="thead-inverse">
@@ -122,7 +153,8 @@
                                 <div class="tab-pane fade" id="v-pills-pending-purchase-orders{{ forloop.counter }}"
                                     role="tabpanel"
                                     aria-labelledby="v-pills-pending-purchase-orders{{ forloop.counter }}">
-                                    <h5>OC{{ value.ocs_futuras|length|pluralize }} futura{{ value.ocs_futuras|length|pluralize }}</h5>
+                                    <h5>OC{{ value.ocs_futuras|length|pluralize }}
+                                        futura{{ value.ocs_futuras|length|pluralize }}</h5>
                                     <div class="table-responsive">
                                         <table class="table table-dark table-striped table-hover">
                                             <thead class="thead-inverse">
@@ -181,9 +213,16 @@
                                         </table>
                                     </div>
                                 </div>
+                                <div class="tab-pane fade" id="v-pills-purchase-action{{ forloop.counter }}"
+                                    role="tabpanel" aria-labelledby="v-pills-purchase-action{{ forloop.counter }}">
+                                    <h3>Comprar:</h3>
+                                    <h5>Quantidade a comprar: {{ value.quantidade_comprar|floatformat:"0" }} pçs</h5>
+                                    <h5>Custo da ação comprar: {{ value.custo_acao_comprar|floatformat:2 }}</h5>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
             {% endfor %}
