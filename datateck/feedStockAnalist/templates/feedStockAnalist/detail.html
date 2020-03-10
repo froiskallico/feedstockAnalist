@@ -24,24 +24,26 @@
 
         </div>
         <hr class="hr-light" />
-        {% if report %}
-        <p class="lead">Itens com falta iminente:</p>
     </header>
 
     <section>
+        {% if report %}
+
+        <p class="lead">Itens com falta iminente:</p>
         <div id="reportAccordian" role="tablist" aria-multiselectable="true">
             {% for key, value in report.items %}
             <div class="card half-opacity text-light mb-1">
-                <div class="card-header role=" tab" id="section{{ forloop.counter }}HeaderId">
+                <div class="card-header" role="tab" id="section{{ forloop.counter }}HeaderId">
                     <h5 class="mb-0">
                         <a class="text-light" data-toggle="collapse" data-parent="#reportAccordian"
-                            href="#section{{ forloop.counter }}ContentId" aria-expanded="true"
+                            href="#section{{ forloop.counter }}ContentId" aria-expanded="false"
                             aria-controls="section{{ forloop.counter }}ContentId">
                             CPD: {{ key|floatformat:"0" }} 📂
                         </a>
                     </h5>
                 </div>
-                <div id="section{{ forloop.counter }}ContentId" class="collapse out show" role="tabpanel"
+
+                <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel"
                     aria-labelledby="section{{ forloop.counter }}HeaderId">
                     <div class="card-body">
                         <div class="row text-center text-light mx-2 rounded">
@@ -59,35 +61,69 @@
                             </div>
                         </div>
 
-                        <h3>OCS para Antecipar</h3>
-                        <p>{{ value.ocs_para_antecipar }}</p>
+                        <div class="container container-fluid row mt-4" id="detail-reports-nav-pills">
+                            <div class="nav flex-column col-2 nav-pills" id="v-pills-tab" role="tablist"
+                                aria-orientation="vertical">
+                                <a class="nav-link active" id="v-pills-timeline{{ forloop.counter }}-tab"
+                                    data-toggle="pill" href="#v-pills-timeline{{ forloop.counter }}" role="tab"
+                                    aria-controls="v-pills-timeline{{ forloop.counter }}"
+                                    aria-selected="true">Timeline</a>
+                                <a class="nav-link" id="v-pills-production-orders{{ forloop.counter }}-tab"
+                                    data-toggle="pill" href="#v-pills-production-orders{{ forloop.counter }}" role="tab"
+                                    aria-controls="v-pills-production-orders{{ forloop.counter }}"
+                                    aria-selected="false">OPs Faltantes</a>
+                                <a class="nav-link" id="v-pills-pending-purchase-orders{{ forloop.counter }}-tab"
+                                    data-toggle="pill" href="#v-pills-pending-purchase-orders{{ forloop.counter }}"
+                                    role="tab" aria-controls="v-pills-pending-purchase-orders{{ forloop.counter }}"
+                                    aria-selected="false">Ordens de Compra Pendentes</a>
+                                <a class="nav-link" id="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}-tab"
+                                    data-toggle="pill"
+                                    href="#v-pills-purchase-orders-to-anticipate{{ forloop.counter }}" role="tab"
+                                    aria-controls="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}"
+                                    aria-selected="false">OCs para Antecipar</a>
+                            </div>
 
-                        <h3>OCs futuras</h3>
-                        {{ value.ocs_futuras }}
-
-                        <h3>Relatório</h3>
-                        {{ value.relatorio }}
-
-
+                            <div class="tab-content col-10" id="v-pills-tabContent">
+                                <div class="tab-pane fade show active" id="v-pills-timeline{{ forloop.counter }}"
+                                    role="tabpanel" aria-labelledby="v-pills-timeline{{ forloop.counter }}-tab">
+                                    <h4>AQUI A TIMELINE</h4>
+                                </div>
+                                <div class="tab-pane fade" id="v-pills-production-orders{{ forloop.counter }}"
+                                    role="tabpanel"
+                                    aria-labelledby="v-pills-production-orders{{ forloop.counter }}-tab">
+                                    <h3>Relatório de OPS que haverão faltas</h3>
+                                    {{ value.relatorio }}
+                                </div>
+                                <div class="tab-pane fade" id="v-pills-pending-purchase-orders{{ forloop.counter }}"
+                                    role="tabpanel"
+                                    aria-labelledby="v-pills-pending-purchase-orders{{ forloop.counter }}">
+                                    <h3>OCs futuras</h3>
+                                    {{ value.ocs_futuras }}
+                                </div>
+                                <div class="tab-pane fade"
+                                    id="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}" role="tabpanel"
+                                    aria-labelledby="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}">
+                                    <h3>Para Antecipar</h3>
+                                    <p>{{ value.ocs_para_antecipar }}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="text-center">
-            <h2>Parabéns!</h2>
-            <img class="m-3"
-                src="https://media3.giphy.com/media/iUOzkJmvnFfqM/giphy.gif?cid=790b76118e457e61fa523a9b4a80dbbf4e3a8a6c13c64e2a&rid=giphy.gif"
-                alt="">
-            <p>Não foi encontrada nenhuma falta!</p>
-        </div>
-        {% endif %}
+
+            {% else %}
+
+            <div class="text-center">
+                <h2>Parabéns!</h2>
+                <img class="m-3"
+                    src="https://media3.giphy.com/media/iUOzkJmvnFfqM/giphy.gif?cid=790b76118e457e61fa523a9b4a80dbbf4e3a8a6c13c64e2a&rid=giphy.gif"
+                    alt="">
+                <p>Não foi encontrada nenhuma falta!</p>
+            </div>
+
+            {% endif %}
     </section>
-
-
-
-
-
 </div>
 {% endblock %}
