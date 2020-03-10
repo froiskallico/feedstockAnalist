@@ -41,7 +41,7 @@
                         </a>
                     </h5>
                 </div>
-                <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel"
+                <div id="section{{ forloop.counter }}ContentId" class="collapse out show" role="tabpanel"
                     aria-labelledby="section{{ forloop.counter }}HeaderId">
                     <div class="card-body">
                         <div class="row text-center text-light mx-2 rounded">
@@ -55,11 +55,20 @@
                             </div>
                             <div class="col-sm rounded mx-1" style="background-color: #444;">
                                 <p class="my-auto font-weight-bold">Custo da Ação Sugerida</p>
-                                <p class="my-auto">R$ {{ value.custo_acao|floatformat:2  }}</p>
+                                <p class="my-auto">{{ value.moeda }} {{ value.custo_acao|floatformat:2  }}</p>
                             </div>
                         </div>
 
-                        {{ value.keys }}
+                        <h3>OCS para Antecipar</h3>
+                        <p>{{ value.ocs_para_antecipar }}</p>
+
+                        <h3>OCs futuras</h3>
+                        {{ value.ocs_futuras }}
+
+                        <h3>Relatório</h3>
+                        {{ value.relatorio }}
+
+
                     </div>
                 </div>
             </div>
