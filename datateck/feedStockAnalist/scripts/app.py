@@ -28,8 +28,11 @@ class App(object):
 
         # Se iniciar o App em movo CSV não cria conexão com Banco de Dados
         if not self.read_from_csv:
-            from feedStockAnalist.scripts.database import Database
-            # from database import Database
+            try:
+                from feedStockAnalist.scripts.database import Database
+            except:
+                from database import Database
+
             self.db = Database()
 
         self.get_production_orders_to_analyze_list()
@@ -176,8 +179,8 @@ class App(object):
                 FIC_TEC FIC
                 JOIN PRODUTOS MP ON MP.PK_PRO = FIC.FK_PRO
                 JOIN ITE_OSE ISE ON ISE.FK_PRO = FIC.FK_PROACAB
-                JOIN MOEDAS MOE ON MOE.PK_MOE = MP.FK_MOE
-                JOIN NIVEL_SERVICO NIV ON NIV.PK_NIV = MP.FK_NIV
+                LEFT JOIN MOEDAS MOE ON MOE.PK_MOE = MP.FK_MOE
+                LEFT JOIN NIVEL_SERVICO NIV ON NIV.PK_NIV = MP.FK_NIV
 
             WHERE
                 ISE.FK_OSE IN ({})
@@ -551,18 +554,10 @@ class App(object):
         def get_item_parameters(CPD_MP):
             parameters = dict()
 
-            parameters["num_of_workdays"] = self.feedstock_to_analyze.loc[
-                self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "MESES_CONSUMO_MRP"].iloc[0]
-            parameters["purchasing_frequency"] = self.feedstock_to_analyze.loc[
-                self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "PERIODICIDADE"].iloc[0]
-            parameters["service_factor"] = self.feedstock_to_analyze.loc[
-                self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FATOR_SERVICO"].iloc[0]
-
-            try:
-                parameters["security_stock_factor"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FES"].iloc[0]
-            except:
-                print(CPD_MP)
-                print(self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FES"])
+            parameters["num_of_workdays"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "MESES_CONSUMO_MRP"].iloc[0]
+            parameters["purchasing_frequency"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "PERIODICIDADE"].iloc[0]
+            parameters["service_factor"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FATOR_SERVICO"].iloc[0]
+            parameters["security_stock_factor"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FES"].iloc[0]
 
             return parameters
 
@@ -701,8 +696,12 @@ class App(object):
             self.dados["how_much_costs_the_purchasing_that_exceeds_max_stock"] = self.dados["how_much_purchasing_exceeds_max_stock"] * item_unitary_price
             return True
 
-        max_stock = self.max_stock_calculation(CPD_MP)
-        self.dados["max_stock"] = max_stock
+        try:
+            max_stock = self.max_stock_calculation(CPD_MP)
+        except:
+            max_stock = 999999999
+
+        self.dados["max_stock"] = max_stoc
 
 
         purchase_quantity = math.ceil(missing_quantity / item_moq) * item_moq
@@ -729,4 +728,5 @@ class App(object):
             return True
         else:
             return False
+
 

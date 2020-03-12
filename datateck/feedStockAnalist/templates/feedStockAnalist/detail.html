@@ -250,6 +250,7 @@
                                     role="tabpanel" aria-labelledby="v-pills-purchase-action{{ forloop.counter }}">
                                     <h3>Comprar:</h3>
                                     <h5>Quantidade a comprar: {{ value.quantidade_comprar|floatformat:"0" }} pçs</h5>
+                                    <h5>Data da primeira falta: {{ value.first_missing_date_balance }}</h5>
                                     <h5>Custo da ação comprar: {{ value.moeda }} {{ value.custo_acao_comprar|floatformat:2 }}</h5>
                                     <h5>MOQ do item: {{ value.item_moq|floatformat:"0" }}</h5>
 

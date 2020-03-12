@@ -3,6 +3,8 @@ from django.utils import timezone
 from django.shortcuts import render
 from django.urls import reverse_lazy
 
+from django.core.mail import send_mail
+
 from feedStockAnalist.scripts.app import App
 from feedStockAnalist.forms import CreateAnalyzeForm
 from .models import Analysis, Reports
@@ -50,7 +52,49 @@ class NewAnalyzeView(generic.FormView):
 
     def form_valid(self, form):
         self.new_analyze = Analysis(created_at=timezone.now())
-        self.analyze(form.cleaned_data["production_orders_list"])
+        try:
+            analyze_id = self.analyze(form.cleaned_data["production_orders_list"])
+            send_mail(
+            subject="feedstockAnalist - Análise finalizada com sucesso.",
+            message="""
+                Oi.
+                \n
+                \n
+                Vim aqui só pra te avisar que a tua análise
+                pra(s) OP(s) {} foi concluída com sucesso e já
+                está disponível.
+                \n
+                \n
+                Use o link http://192.168.1.117:80/detail/{}
+                para acessá-la diretamente.
+                """.format(
+                    str(form.cleaned_data["production_orders_list"]),
+                    str(analyze_id)
+                ),
+            from_email="froiskallico@gmail.com",
+            recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
+            )
+        except Exception as e:
+            send_mail(
+            subject="feedstockAnalist - Deu merda!",
+            message="""
+                Oi.
+                \n
+                \n
+                Vim aqui só pra te avisar que a tua análise
+                pra(s) OP(s) {} não foi concluída com sucesso.
+                Tente novamente acessando: http://192.168.1.117:80/new
+                \n
+                \n
+                {}
+
+                """.format(
+                    str(form.cleaned_data["production_orders_list"]),
+                    str(e)
+                ),
+            from_email="froiskallico@gmail.com",
+            recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
+            )
         return super(NewAnalyzeView, self).form_valid(form)
 
 
@@ -60,7 +104,7 @@ class NewAnalyzeView(generic.FormView):
         self.new_analyze.synthesis = analyze.synthesis
         self.new_analyze.save()
         self.new_analyze.reports_set.create(report=analyze.save_to_json())
-        return True
+        return self.new_analyze.id
 
 class DeleteAnalyzeView(generic.DeleteView):
     model = Analysis
