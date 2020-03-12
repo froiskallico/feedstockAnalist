@@ -1,6 +1,7 @@
 from django.views import generic
 from django.utils import timezone
 from django.shortcuts import render
+from django.urls import reverse_lazy
 
 from feedStockAnalist.scripts.app import App
 from feedStockAnalist.forms import CreateAnalyzeForm
@@ -45,7 +46,7 @@ class DetailView(generic.TemplateView):
 class NewAnalyzeView(generic.FormView):
     form_class = CreateAnalyzeForm
     template_name = 'feedStockAnalist/new_analyze.html'
-    success_url = '/'
+    success_url = reverse_lazy('feedStockAnalist:index')
 
     def form_valid(self, form):
         self.new_analyze = Analysis(created_at=timezone.now())
@@ -61,6 +62,8 @@ class NewAnalyzeView(generic.FormView):
         self.new_analyze.reports_set.create(report=analyze.save_to_json())
         return True
 
-
+class DeleteAnalyzeView(generic.DeleteView):
+    model = Analysis
+    success_url = reverse_lazy('feedStockAnalist:index')
 
 

@@ -11,5 +11,5 @@ class Analysis(models.Model):
     synthesis = JSONField()
 
 class Reports(models.Model):
-    analysis = models.ForeignKey(Analysis, on_delete=models.PROTECT)
+    analysis = models.ForeignKey(Analysis, on_delete=models.CASCADE)
     report = JSONField()

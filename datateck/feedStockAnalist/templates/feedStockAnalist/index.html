@@ -21,7 +21,7 @@
                             <th>Quantidade de Itens</th>
                             <th>Itens com falta</th>
                             <th>Custo das Ações</th>
-                            <th>Abrir</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody class='text-dark rounded'>
@@ -30,13 +30,13 @@
                             <td scope="row">{{ analyze.synthesis.production_orders_to_analyze_list }}</td>
                             <td>{{ analyze.created_at }}</td>
                             <td>{{ analyze.synthesis.feedstock_items_count }}</td>
-                            <!-- TODO: Here load and parse analyze.report fieldsa -->
-                            <td>{{ analyze.synthesis.fault_feedstock_items_count }}</td>
+                            <td>{{ analyze.synthesis.missing_feedstock_items_count }}</td>
                             <td>R$ {{ analyze.synthesis.total_cost_of_actions|floatformat:2 }}</td>
                             <td>
-                                <a href="{{ analyze.id }}" type="button" class="btn btn-outline-dark">
+                                <a href="detail/{{ analyze.id }}" type="button" class="btn btn-outline-dark">
                                     Abrir
                                 </a>
+                                <a href="/delete/{{ analyze.id }}" class="ml-3 text-dark"><i class="fa fa-trash"></i></a>
                             </td>
                         </tr>
                         {% endfor %}

@@ -683,18 +683,3 @@ class App(object):
             alert_if_purchase_quantity_exceeds_moq(missing_quantity, purchase_quantity, item_moq)
 
         return purchase_quantity
-
-
-
-
-
-a = App()
-
-a.analyze(production_orders_to_analyze_list=114565)
-
-for key, value in a.report[7489.0].items():
-    print('{ %s : %s }'%(key, value))
-# %%
-
-
-# %%

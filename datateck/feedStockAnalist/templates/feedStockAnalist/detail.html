@@ -14,7 +14,7 @@
                 </div>
                 <div class="col-sm" style="background-color: #e0e0e0;">
                     <p class="my-auto font-weight-bold">Itens com falta iminente</p>
-                    <p class="my-auto">{{ synthesis.fault_feedstock_items_count }}</p>
+                    <p class="my-auto">{{ synthesis.missing_feedstock_items_count }}</p>
                 </div>
                 <div class="col-sm">
                     <p class="my-auto font-weight-bold">Custo total das ações sugeridas</p>
@@ -52,7 +52,7 @@
                                 <p class="my-auto font-weight-bold">Quantidade que faltará</p>
                                 <p class="my-auto">{{ value.quantidade_falta|floatformat:"0" }} pçs</p>
                             </div>
-                            <div class="col-sm rounded mx-1" style="background-color: #333;">
+                            <div class="col-sm rounded mx-1" style="background-color: {% if value.purchase_quantity_exceeds_moq_alert %}#900{% else %}#333{% endif %};">
                                 <p class="my-auto font-weight-bold">Ação sugerida</p>
                                 <p class="my-auto">{{ value.acao_sugerida }}</p>
                             </div>
@@ -232,6 +232,9 @@
                                     <h3>Comprar:</h3>
                                     <h5>Quantidade a comprar: {{ value.quantidade_comprar|floatformat:"0" }} pçs</h5>
                                     <h5>Custo da ação comprar: {{ value.moeda }} {{ value.custo_acao_comprar|floatformat:2 }}</h5>
+                                    <h5>MOQ do item: {{ value.item_moq|floatformat:"0" }}</h5>
+                                    <h5>Quantidade Excedente: {{ value.how_much_purchasing_exceeds_missing_quantity|floatformat:"0" }} pçs</h5>
+                                    <h5>Valor da Quantidade Excedente: {{ value.moeda }} {{ value.how_much_costs_the_purchasing_that_exceeds_missing_quantity }}</h5>
                                 </div>
                             </div>
                         </div>

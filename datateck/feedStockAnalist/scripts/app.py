@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from functools import reduce
 import json
 from io import StringIO
+import math
 
 start_time = datetime.now()
 
@@ -33,8 +34,6 @@ class App(object):
 
         print("\n\n🐹 Estamos colocando os hamsters para correrem! ")
 
-
-
         self.get_production_orders_to_analyze()
         self.get_products_to_analyze()
         self.get_feedstock_to_analyze()
@@ -53,7 +52,7 @@ class App(object):
         for cpd in self.CPDs:
             self.timeline(CPD_MP=cpd)
 
-        self.synthesis["fault_feedstock_items_count"] = len(self.report)
+        self.synthesis["missing_feedstock_items_count"] = len(self.report)
 
         return self.save_to_json()
 
@@ -150,7 +149,7 @@ class App(object):
 
         def fetch_data_from_database():
             return pd.read_sql(
-            """
+                """
             SELECT DISTINCT
                 MP.PK_PRO CPD_MP,
                 MP.COD_FABRIC CODIGO_MP,
@@ -163,13 +162,19 @@ class App(object):
                 COALESCE(MP.PERC_ESTOQUE_CORTE, 0) PERC_ESTOQUE_CORTE,
                 MP.HORIZONTE_PROGRAMACAO,
                 MP.PREC_COMPR CUSTO_MP,
-                MOE.SIMBOLO SIMBOLO
+                MOE.SIMBOLO SIMBOLO,
+                MP.MESES_CONSUMO_MRP,
+                MP.PERIODICIDADE,
+                MP.LEADTIME FES,
+                NIV.FATOR_SERVICO,
+                MP.MOQ
 
             FROM
                 FIC_TEC FIC
                 JOIN PRODUTOS MP ON MP.PK_PRO = FIC.FK_PRO
                 JOIN ITE_OSE ISE ON ISE.FK_PRO = FIC.FK_PROACAB
                 JOIN MOEDAS MOE ON MOE.PK_MOE = MP.FK_MOE
+                JOIN NIVEL_SERVICO NIV ON NIV.PK_NIV = MP.FK_NIV
 
             WHERE
                 ISE.FK_OSE IN ({})
@@ -180,15 +185,19 @@ class App(object):
         def fetch_data_from_csv():
             return pd.read_csv(self.path_csv + 'mp_em_analise.csv')
 
-        self.feedstock_to_analyze = fetch_data_from_csv() if self.read_from_csv else fetch_data_from_database()
+        self.feedstock_to_analyze = fetch_data_from_csv(
+        ) if self.read_from_csv else fetch_data_from_database()
 
         def normalize_fields(dict_of_data_to_normalize):
             for key, value in dict_of_data_to_normalize.items():
-                self.feedstock_to_analyze = self.feedstock_to_analyze.fillna(value={ key: value }).replace({ key: 0 }, value)
+                self.feedstock_to_analyze = self.feedstock_to_analyze.fillna(
+                    value={key: value}).replace({key: 0}, value)
 
         def calculate_stocks_to_consider():
-            self.feedstock_to_analyze["ESTOQUE_LP_CONSIDERADO"] = self.feedstock_to_analyze["ESTOQUE_LP"] * (self.feedstock_to_analyze["PERC_ESTOQUE_LP"]/100)
-            self.feedstock_to_analyze["ESTOQUE_CORTE_CONSIDERADO"] = self.feedstock_to_analyze["ESTOQUE_CORTE"] * (self.feedstock_to_analyze["PERC_ESTOQUE_CORTE"]/100)
+            self.feedstock_to_analyze["ESTOQUE_LP_CONSIDERADO"] = self.feedstock_to_analyze["ESTOQUE_LP"] * (
+                self.feedstock_to_analyze["PERC_ESTOQUE_LP"]/100)
+            self.feedstock_to_analyze["ESTOQUE_CORTE_CONSIDERADO"] = self.feedstock_to_analyze["ESTOQUE_CORTE"] * (
+                self.feedstock_to_analyze["PERC_ESTOQUE_CORTE"]/100)
 
         def calculate_opening_balance():
             stocks = (
@@ -197,7 +206,8 @@ class App(object):
                 "ESTOQUE_CORTE_CONSIDERADO"
             )
 
-            self.feedstock_to_analyze["SALDO_INICIAL"] = sum([self.feedstock_to_analyze[field] for field in stocks])
+            self.feedstock_to_analyze["SALDO_INICIAL"] = sum(
+                [self.feedstock_to_analyze[field] for field in stocks])
 
         def calculate_feedstock_items_count():
             return len(self.feedstock_to_analyze)
@@ -271,10 +281,12 @@ class App(object):
         def fetch_data_from_csv():
             return pd.read_csv(self.path_csv + 'ocs_pendentes.csv')
 
-        self.open_purchase_orders = fetch_data_from_csv() if self.read_from_csv else fetch_data_from_database()
+        self.open_purchase_orders = fetch_data_from_csv(
+        ) if self.read_from_csv else fetch_data_from_database()
 
         # Normliza as datas para formato DateTime
-        self.open_purchase_orders["ENTREGA"] = pd.to_datetime(self.open_purchase_orders["ENTREGA"])
+        self.open_purchase_orders["ENTREGA"] = pd.to_datetime(
+            self.open_purchase_orders["ENTREGA"])
 
     def get_ops_pendentes(self):
         # Obtem as ordens de produção pendentes para as MPs vinculadas à analise
@@ -440,9 +452,9 @@ class App(object):
 
         # Se houver falta na TL, verificar as datas e OPs em que havera e registrar no relatorio de faltas
         if havera_falta:
-            dados = dict()
+            self.dados = dict()
 
-            dados["timeline"] = self.tl.reset_index().to_dict(orient="records")
+            self.dados["timeline"] = self.tl.reset_index().to_dict(orient="records")
 
             # Define as datas em que haverá falta de MP
             self.datas_falta = self.tl[self.tl["FALTA"]][["ENTREGA", "CPD_MP"]]
@@ -454,67 +466,219 @@ class App(object):
             self.ops_falta = pd.merge(self.datas_falta, self.ops_pendentes.loc[self.ops_pendentes["CPD_MP"] == CPD_MP].set_index(
                 "ENTREGA"), on=["ENTREGA", "CPD_MP"], how="inner")
 
-            total_falta = self.ops_falta.sum()["COMPROMETIDO"]
+            total_missing_quantity = self.ops_falta.sum()["COMPROMETIDO"]
+            self.dados["quantidade_falta"] = total_missing_quantity
 
             self.ocs_futuras = self.check_purchases(CPD_MP, pri_data_falta)
             self.ocs_futuras.loc[:,
                                  "ACUMULADO_OCS"] = self.ocs_futuras["QTD_PENDENTE_OC"].cumsum()
 
-            dados["moeda"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "SIMBOLO"].iloc[0]
-            dados["custo_unit"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0]
+            self.dados["moeda"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]
+                                                           == CPD_MP, "SIMBOLO"].iloc[0]
+            self.dados["custo_unit"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]
+                                                                == CPD_MP, "CUSTO_MP"].iloc[0]
 
             if len(self.ocs_futuras) > 0:
-                dados["acao_sugerida"] = "Antecipar"
-                # TODO: Here calculate the anticipation and if it have unless the necessary to cover the total fault, throw an "purchase" action too
+                self.dados["acao_sugerida"] = "Antecipar"
+
                 try:
                     self.ocs_antecipar = self.ocs_futuras.set_index(
-                        "ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"] >= total_falta].iloc[0]["ENTREGA"]].reset_index()
+                        "ENTREGA").loc[:self.ocs_futuras[self.ocs_futuras["ACUMULADO_OCS"] >= total_missing_quantity].iloc[0]["ENTREGA"]].reset_index()
                 except:
                     self.ocs_antecipar = self.ocs_futuras.reset_index()
-                    dados["acao_sugerida"] = "Antecipar/Comprar"
+                    self.dados["acao_sugerida"] = "Antecipar/Comprar"
                     return
 
-                dados["quantidade_antecipar"] = self.ocs_futuras["QTD_PENDENTE_OC"].sum()
-                dados["quantidade_comprar"] = total_falta - dados["quantidade_antecipar"]
+                self.dados["quantidade_antecipar"] = self.ocs_futuras["QTD_PENDENTE_OC"].sum()
+                remaining_missing_quantity = total_missing_quantity - self.dados["quantidade_antecipar"]
+                self.dados["quantidade_comprar"] = self.get_purchase_quantity(CPD_MP=CPD_MP, missing_quantity=remaining_missing_quantity)
 
-                dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(
+
+                self.dados["ocs_futuras"] = self.ocs_futuras.reset_index().to_dict(
                     orient="records")
-                dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(
+                self.dados["ocs_para_antecipar"] = self.ocs_antecipar.to_dict(
                     orient="records")
 
-                dados["moeda"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "SIMBOLO"].iloc[0]
-                dados["custo_acao_antecipar"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
+                self.dados["moeda"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]
+                                                               == CPD_MP, "SIMBOLO"].iloc[0]
+                self.dados["custo_acao_antecipar"] = self.ocs_antecipar["VALOR_TOTAL"].sum()
 
-                self.synthesis["total_cost_of_actions"] += dados["custo_acao_antecipar"]
+                self.synthesis["total_cost_of_actions"] += self.dados["custo_acao_antecipar"]
 
-                if dados["quantidade_comprar"] > 0:
-                    dados["custo_acao_comprar"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0] * dados["quantidade_comprar"]
-                    self.synthesis["total_cost_of_actions"] += dados["custo_acao_comprar"]
+                if self.dados["quantidade_comprar"] > 0:
+                    self.dados["custo_acao_comprar"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]
+                                                                                == CPD_MP, "CUSTO_MP"].iloc[0] * self.dados["quantidade_comprar"]
+                    self.synthesis["total_cost_of_actions"] += self.dados["custo_acao_comprar"]
                 else:
-                    dados["quantidade_comprar"] = 0
-                    dados["custo_acao_comprar"] = 0
+                    self.dados["quantidade_comprar"] = 0
+                    self.dados["custo_acao_comprar"] = 0
 
             else:
-                dados["acao_sugerida"] = "Comprar"
-                dados["quantidade_comprar"] = total_falta
-                dados["custo_acao_comprar"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CUSTO_MP"].iloc[0] * dados["quantidade_comprar"]
-                self.synthesis["total_cost_of_actions"] += dados["custo_acao_comprar"]
+                self.dados["acao_sugerida"] = "Comprar"
+                self.get_purchase_quantity(CPD_MP=CPD_MP, missing_quantity=total_missing_quantity)
+                self.dados["custo_acao_comprar"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]
+                                                                            == CPD_MP, "CUSTO_MP"].iloc[0] * self.dados["quantidade_comprar"]
+                self.synthesis["total_cost_of_actions"] += self.dados["custo_acao_comprar"]
 
                 # Calcular Média de Vendas MRP
                 # Calcular Estoque Máximo MRP
                 # Verificar se saldo final da data que precisa de antecipação ficará acima do Estoque Máximo MRP
                 # Se ficar acima do estoque máximo, Criar alerta de estoque máximo
 
-            dados["quantidade_falta"] = self.ops_falta.sum()["COMPROMETIDO"]
-            dados["relatorio"] = self.ops_falta.reset_index().to_dict(
+            self.dados["relatorio"] = self.ops_falta.reset_index().to_dict(
                 orient="records")
 
-            self.report[CPD_MP] = dados
+            self.report[CPD_MP] = self.dados
 
     def check_purchases(self, CPD_MP, data_primeira_falta):
         return self.open_purchase_orders[self.open_purchase_orders["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()
 
+    def max_stock_calculation(self, CPD_MP):
+        def get_item_parameters(CPD_MP):
+            parameters = dict()
 
-a = App()
+            parameters["num_of_workdays"] = self.feedstock_to_analyze.loc[
+                self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "MESES_CONSUMO_MRP"].iloc[0]
+            parameters["purchasing_frequency"] = self.feedstock_to_analyze.loc[
+                self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "PERIODICIDADE"].iloc[0]
+            parameters["service_factor"] = self.feedstock_to_analyze.loc[
+                self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FATOR_SERVICO"].iloc[0]
+            parameters["security_stock_factor"] = self.feedstock_to_analyze.loc[
+                self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FES"].iloc[0]
 
-# %%
+            return parameters
+
+        def get_date_subtracting_workdays(from_date, num_of_workdays_to_subtract):
+            current_date = from_date
+            num_of_workdays_to_subtract = num_of_workdays_to_subtract
+
+            while num_of_workdays_to_subtract > 0:
+                current_date -= timedelta(days=1)
+
+                if current_date.weekday() >= 5:
+                    continue
+
+                num_of_workdays_to_subtract -= 1
+
+            return current_date
+
+        def get_item_sales_amount_in_period(CPD_MP, from_date, to_date):
+            query = """
+                        SELECT
+                            SUM(ITE.QUANTIDADE)
+                        FROM
+                            MOV_ITEM ITE
+                            JOIN MOV_DOC DOC ON DOC.PK_DOC = ITE.FK_DOC
+                        WHERE
+                            ITE.FK_PRO = {} AND
+                            DOC.DATAEXP >= '{}' AND
+                            DOC.DATAEXP < '{}' AND
+                            DOC.SOMDIMEST = 'D' AND
+                            DOC.FK_TIP = 6
+                        GROUP BY
+                            ITE.FK_PRO
+                        """.format(
+                str(CPD_MP),
+                str(from_date),
+                str(to_date)
+            )
+
+            sales_amount = self.db.connection.cursor().execute(query).fetchone()[
+                0]
+
+            return sales_amount
+
+        def get_item_sales_average_in_period(CPD_MP, from_date, to_date, num_of_workdays):
+            sales_amount = get_item_sales_amount_in_period(
+                CPD_MP=CPD_MP,
+                from_date=from_date,
+                to_date=to_date
+            )
+
+            sales_average = float(sales_amount / num_of_workdays * 20)
+
+            return sales_average
+
+        def get_item_sales_standard_deviation_in_period(CPD_MP, from_date, to_date):
+            query = """
+                        SELECT
+                            SUM(ITE.QUANTIDADE) QUANTIDADE
+                        FROM
+                            MOV_ITEM ITE
+                            JOIN MOV_DOC DOC ON DOC.PK_DOC = ITE.FK_DOC
+                        WHERE
+                            ITE.FK_PRO = {} AND
+                            DOC.DATAEXP >= '{}' AND
+                            DOC.DATAEXP < '{}' AND
+                            DOC.SOMDIMEST = 'D' AND
+                            DOC.FK_TIP = 6
+                        GROUP BY
+                            DOC.DATAEXP
+                        """.format(
+                str(CPD_MP),
+                str(from_date),
+                str(to_date)
+            )
+
+            daily_sales = pd.read_sql(query, self.db.connection)
+
+            sales_standard_deviation = daily_sales["QUANTIDADE"].std()
+            return sales_standard_deviation
+
+        yesterday = datetime.today().date() - timedelta(days=1)
+
+        item_parameters = get_item_parameters(CPD_MP)
+
+        start_date = get_date_subtracting_workdays(
+            yesterday, item_parameters["num_of_workdays"])
+
+        sales_amount = get_item_sales_amount_in_period(
+            CPD_MP=CPD_MP,
+            from_date=start_date,
+            to_date=yesterday)
+
+        sales_average = get_item_sales_average_in_period(
+            CPD_MP=CPD_MP,
+            from_date=start_date,
+            to_date=yesterday,
+            num_of_workdays=item_parameters["num_of_workdays"])
+
+        sales_standard_deviation = get_item_sales_standard_deviation_in_period(
+            CPD_MP=CPD_MP,
+            from_date=start_date,
+            to_date=yesterday)
+
+        security_stock = sales_standard_deviation * \
+            item_parameters["service_factor"]
+
+        purchase_order_point = sales_average / 30 * \
+            item_parameters["security_stock_factor"] + security_stock
+
+        max_stock = purchase_order_point + \
+            (sales_average * item_parameters["purchasing_frequency"])
+
+        return max_stock
+
+    def get_purchase_quantity(self, CPD_MP, missing_quantity):
+        item_moq = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "MOQ"].iloc[0]
+        self.dados["item_moq"] = item_moq
+
+        def alert_if_purchase_quantity_exceeds_moq(missing_quantity, purchase_quantity, item_moq):
+            self.dados["purchase_quantity_exceeds_moq_alert"] = True
+            self.dados["how_much_purchasing_exceeds_missing_quantity"] = purchase_quantity - missing_quantity
+
+            item_unitary_price = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]== CPD_MP, "CUSTO_MP"].iloc[0]
+
+            self.dados["how_much_costs_the_purchasing_that_exceeds_missing_quantity"] = self.dados["how_much_purchasing_exceeds_missing_quantity"] * item_unitary_price
+            return True
+
+        max_stock = self.max_stock_calculation(CPD_MP)
+
+        purchase_quantity = math.ceil(missing_quantity / item_moq) * item_moq
+
+        self.dados["quantidade_comprar"] = purchase_quantity
+
+        if purchase_quantity < item_moq:
+            alert_if_purchase_quantity_exceeds_moq(missing_quantity, purchase_quantity, item_moq)
+
+        return purchase_quantity
