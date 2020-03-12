@@ -473,7 +473,7 @@ class App(object):
             # Define a primeira data em que haverá falta de MP
             pri_data_falta = self.datas_falta["ENTREGA"].min()
 
-            self.dados["first_missing_date_balance"] = float(a.tl.loc[a.tl["ENTREGA"]==pri_data_falta, "SALDO_FINAL"].iloc[0])
+            self.dados["first_missing_date_balance"] = float(self.tl.loc[self.tl["ENTREGA"]==pri_data_falta, "SALDO_FINAL"].iloc[0])
 
             self.check_if_item_needs_purchase_before_leadtime(CPD_MP=CPD_MP, first_missing_date=pri_data_falta)
 
@@ -702,6 +702,8 @@ class App(object):
             return True
 
         max_stock = self.max_stock_calculation(CPD_MP)
+        self.dados["max_stock"] = max_stock
+
 
         purchase_quantity = math.ceil(missing_quantity / item_moq) * item_moq
 
