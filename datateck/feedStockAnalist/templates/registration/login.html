@@ -11,9 +11,15 @@
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
+
             <p class="lead">
                 <button type="submit" class="btn btn-success btn-lg">Login</button>
             </p>
+            <a href="/signup">
+                <small class="text-muted">
+                    <p>Cadastre-se</p>
+                </small>
+            </a>
         </form>
     </div>
 </div>

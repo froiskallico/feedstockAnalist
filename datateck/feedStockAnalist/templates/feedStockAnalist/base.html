@@ -52,10 +52,12 @@
         </nav>
     </header>
 
-    <main class="p-4 row h-75 mx-auto">
+    <main class="p-4 col h-75 mx-auto">
         {% block content %}
         {% endblock %}
     </main>
+
+    <button onclick="topFunction()" id="buttonToTop" title="Voltar para o topo"><i class="fas fa-chevron-up"></i></button>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -68,6 +70,25 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
         </script>
+
+    <script>
+        buttonToTop = document.getElementById("buttonToTop");
+
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                buttonToTop.style.display = "block";
+            } else {
+                buttonToTop.style.display = "none";
+            }
+        };
+
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        };
+    </script>
 </body>
 
 </html>

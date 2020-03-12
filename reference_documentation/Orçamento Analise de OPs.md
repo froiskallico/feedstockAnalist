@@ -15,13 +15,13 @@ Sistema que faça a análise de necessidades de matérias primas em uma ou mais 
   - [x] **Para qual(is) OP(s) ocorrerá** a falta;
   - [x] **Para qual(is) cliente(s)** ocorreá a falta;
   - [x] **De quanto** será a falta;
-  - [x] **Ação sugerida** (Antecipar OC, Colocar OC):
+  - [ ] **Ação sugerida** (Antecipar OC, Colocar OC):
     - [x] Se a sugestão for antecipar => **Qual OC antecipar**;
     - [ ] Se a sugestão for comprar => **Quanto comprar (*buscando respeitar o estoque máximo MRP*)**:
       - [x] O sistema usará os parâmetros atuais já existentes do MRP para cálculo do estoque máximo;
       - [ ] Alertar o usuário se a sugestão ultrapassar o estoque máximo.
-  - [ ] **Alerta** de Lead Time (*Se a necessidade for para um prazo menor que o Lead Time, indicando necessidade de ação emergencial*).
-- [ ] Calcular o valor financeiro das compras sugeridas, por item e total da análise;
+  - [x] **Alerta** de Lead Time (*Se a necessidade for para um prazo menor que o Lead Time, indicando necessidade de ação emergencial*).
+- [x] Calcular o valor financeiro das compras sugeridas, por item e total da análise;
 - [x] As análises ficarão registradas em banco de dados, com os dados do momento em que foram feitas (Foto da análise);
 - [ ] Exportação da análise para excel;
 - [ ] Exportação das sugestões de compras para posterior importação no Delphus;

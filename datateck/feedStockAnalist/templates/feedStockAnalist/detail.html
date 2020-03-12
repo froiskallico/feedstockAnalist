@@ -33,14 +33,33 @@
         <div id="reportAccordian" role="tablist" aria-multiselectable="true">
             {% for key, value in report.items %}
             <div class="card half-opacity text-light mb-1">
-                <div class="card-header" role="tab" id="section{{ forloop.counter }}HeaderId">
-                    <h5 class="mb-0">
-                        <a class="text-light" data-toggle="collapse" data-parent="#reportAccordian"
-                            href="#section{{ forloop.counter }}ContentId" aria-expanded="false"
-                            aria-controls="section{{ forloop.counter }}ContentId">
-                            CPD: {{ key|floatformat:"0" }} 📂
-                        </a>
-                    </h5>
+                <div
+                class="card-header"
+                {% if value.item_needs_purchase_before_leadtime %}
+                style="box-shadow: rgba(255, 0, 0, 0.3) 0 0 0 100px inset;"
+                {% endif %}
+                role="tab"
+                id="section{{ forloop.counter }}HeaderId">
+                    <a
+                        class="text-light row"
+                        data-toggle="collapse"
+                        data-parent="#reportAccordian"
+                        href="#section{{ forloop.counter }}ContentId"
+                        aria-expanded="false"
+                        aria-controls="section{{ forloop.counter }}ContentId"
+                        onclick="toggleChevron({{ forloop.counter }})"
+                    >
+                        <h5>
+                            <i class="fas fa-chevron-down fa-fw mx-2" id="chevron-{{ forloop.counter }}">
+                            </i>
+                            <span class="badge badge-pill badge-dark text-light">
+                                {{ key|floatformat:"0" }}
+                            </span>
+                        </h5>
+                        <span class="item-title ml-2    ">
+                            <h5>{{ value.item_partnumber }}</h5>
+                        </span>
+                    </a>
                 </div>
 
                 <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel"
@@ -233,8 +252,10 @@
                                     <h5>Quantidade a comprar: {{ value.quantidade_comprar|floatformat:"0" }} pçs</h5>
                                     <h5>Custo da ação comprar: {{ value.moeda }} {{ value.custo_acao_comprar|floatformat:2 }}</h5>
                                     <h5>MOQ do item: {{ value.item_moq|floatformat:"0" }}</h5>
+                                    {% if value.purchase_quantity_exceeds_moq_alert %}
                                     <h5>Quantidade Excedente: {{ value.how_much_purchasing_exceeds_missing_quantity|floatformat:"0" }} pçs</h5>
                                     <h5>Valor da Quantidade Excedente: {{ value.moeda }} {{ value.how_much_costs_the_purchasing_that_exceeds_missing_quantity }}</h5>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -257,4 +278,13 @@
             {% endif %}
     </section>
 </div>
+
+<script>
+    function toggleChevron(id) {
+        icon_class_list = document.getElementById("chevron-"+id).classList;
+
+        icon_class_list.toggle("fa-chevron-down");
+        icon_class_list.toggle("fa-chevron-up");
+    }
+</script>
 {% endblock %}

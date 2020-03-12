@@ -1,20 +1,52 @@
-<!-- {% extends 'registration/base.html' %}
+{% extends 'registration/base.html' %}
 {% load static %}
 
 {% block content %}
-<div class="row h-100">
+<div class="row h-100 my-auto">
     <div class="container rounded bg-light py-4 my-auto mx-auto col-xl-8 text-center">
-        <img src="{% static 'fsa/fSA_logo.svg' %}" alt="" class="" style="max-height: 100px;">
-        <h1 class="text-center font-weight-lighter text-break">feedStockAnalist</h1>
-        <h1 class="display-5">Cadastre-se</h1>
+        <img src="{% static 'fsa/fSA_logo.svg' %}" alt="" class="" style="max-height: 30px;">
+        <h4 class="text-center font-weight-lighter text-break">feedStockAnalist</h4>
+        <h2 class="display-5">Cadastre-se</h2>
         <hr class="my-2">
-        <form method="post" class="text-left">
+        <form method="post" class="text-center w-50 mx-auto">
             {% csrf_token %}
-            {{ form.as_p }}
+            <div class="form-group">
+                <label for="id_username">Usuário:</label>
+                <input type="text" class="form-control w-75 mx-auto text-break" name="username" id="id_username"
+                    aria-describedby="Nome de Usuário" placeholder="Digite um nome de usuário...">
+                <small id="Nome de Usuário" class="form-text text-muted">
+                    Obrigatório. No máximo 150 caracteres. Apenas: Letras, números e @/./+/-/_
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1">Senha:</label>
+                <input type="password" class="form-control w-50 mx-auto" name="password1" id="id_password1"
+                    placeholder="Digite sua senha...">
+                <small id="Senha" class="form-text text-muted">
+                    <ul>
+                        <li>Sua senha não pode ser tão parecida com suas outras informações pessoais.</li>
+                        <li>Sua senha precisa conter pelo menos 8 caracteres.</li>
+                        <li>Sua senha não pode ser uma senha habitualmente utilizada.</li>
+                        <li>Sua senha não pode ser inteiramente numérica.</li>
+                    </ul>
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2">Confirmação de Senha:</label>
+                <input type="password" class="form-control w-50 mx-auto" name="password2" id="id_password2"
+                    placeholder="Confirme sua senha...">
+                <small id="Senha" class="form-text text-muted">
+                    Informe a mesma senha informada anteriormente, para
+                    verificação.
+                </small>
+            </div>
+
             <p class="lead">
-                <button type="submit" class="btn btn-success btn-lg">Login</button>
+                <button type="submit" class="btn btn-success btn-lg">Registrar</button>
             </p>
         </form>
     </div>
 </div>
-{% endblock %} -->
+{% endblock %}

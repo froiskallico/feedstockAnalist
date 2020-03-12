@@ -10,10 +10,10 @@
     </header>
 
     <section>
-        {% if analysis_list %}
-        <div class="card m-3">
-            <div class="table-responsive">
-                <table class="table table-light table-hover table-striped">
+        <div class="card m-3 half-opacity rounded">
+            {% if analysis_list %}
+            <div class="table-responsive rounded">
+                <table class="table rounded table-light text-dark table-hover table-striped">
                     <thead>
                         <tr>
                             <th>OP</<th>
@@ -44,7 +44,7 @@
                 </table>
             </div>
             {% else %}
-            <div class="card text-white half-opacity text-center col-sm-5 mx-auto">
+            <div class="card text-light half-opacity text-center col-sm p-5 mx-auto">
                 <div class="card-body">
                     <h4 class="card-title">Nenhum análise ainda</h4>
                     <p class="card-text">Clique em nova análise para começar</p>

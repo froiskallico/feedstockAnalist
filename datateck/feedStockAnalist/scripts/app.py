@@ -1,3 +1,4 @@
+#%%
 from pprint import pprint
 import numpy as np
 import pandas as pd
@@ -28,6 +29,7 @@ class App(object):
         # Se iniciar o App em movo CSV não cria conexão com Banco de Dados
         if not self.read_from_csv:
             from feedStockAnalist.scripts.database import Database
+            # from database import Database
             self.db = Database()
 
         self.get_production_orders_to_analyze_list()
@@ -167,7 +169,8 @@ class App(object):
                 MP.PERIODICIDADE,
                 MP.LEADTIME FES,
                 NIV.FATOR_SERVICO,
-                MP.MOQ
+                MP.MOQ,
+                MP.DELAY_OC LEADTIME
 
             FROM
                 FIC_TEC FIC
@@ -217,7 +220,13 @@ class App(object):
 
         data_to_normalize = {"PERC_ESTOQUE_LP": 50,
                              "PERC_ESTOQUE_CORTE": 50,
-                             "HORIZONTE_PROGRAMACAO": 100}
+                             "HORIZONTE_PROGRAMACAO": 100,
+                             "PERIODICIDADE": 1,
+                             "FES": 20,
+                             "FATOR_SERVICO": 2,
+                             "MOQ": 1,
+                             "LEADTIME": 2
+                             }
 
         normalize_fields(data_to_normalize)
         calculate_stocks_to_consider()
@@ -451,8 +460,10 @@ class App(object):
         havera_falta = len(self.tl[self.tl["FALTA"] == True])
 
         # Se houver falta na TL, verificar as datas e OPs em que havera e registrar no relatorio de faltas
-        if havera_falta:
+        if havera_falta > 0:
             self.dados = dict()
+
+            self.dados["item_partnumber"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "CODIGO_MP"].iloc[0]
 
             self.dados["timeline"] = self.tl.reset_index().to_dict(orient="records")
 
@@ -461,6 +472,8 @@ class App(object):
 
             # Define a primeira data em que haverá falta de MP
             pri_data_falta = self.datas_falta["ENTREGA"].min()
+
+            self.check_if_item_needs_purchase_before_leadtime(CPD_MP=CPD_MP, first_missing_date=pri_data_falta)
 
             # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
             self.ops_falta = pd.merge(self.datas_falta, self.ops_pendentes.loc[self.ops_pendentes["CPD_MP"] == CPD_MP].set_index(
@@ -487,7 +500,6 @@ class App(object):
                 except:
                     self.ocs_antecipar = self.ocs_futuras.reset_index()
                     self.dados["acao_sugerida"] = "Antecipar/Comprar"
-                    return
 
                 self.dados["quantidade_antecipar"] = self.ocs_futuras["QTD_PENDENTE_OC"].sum()
                 remaining_missing_quantity = total_missing_quantity - self.dados["quantidade_antecipar"]
@@ -543,8 +555,12 @@ class App(object):
                 self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "PERIODICIDADE"].iloc[0]
             parameters["service_factor"] = self.feedstock_to_analyze.loc[
                 self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FATOR_SERVICO"].iloc[0]
-            parameters["security_stock_factor"] = self.feedstock_to_analyze.loc[
-                self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FES"].iloc[0]
+
+            try:
+                parameters["security_stock_factor"] = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FES"].iloc[0]
+            except:
+                print(CPD_MP)
+                print(self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"] == CPD_MP, "FES"])
 
             return parameters
 
@@ -583,8 +599,10 @@ class App(object):
                 str(to_date)
             )
 
-            sales_amount = self.db.connection.cursor().execute(query).fetchone()[
-                0]
+            try:
+                sales_amount = float(self.db.connection.cursor().execute(query).fetchone()[0])
+            except:
+                sales_amount = 0
 
             return sales_amount
 
@@ -678,7 +696,18 @@ class App(object):
 
         self.dados["quantidade_comprar"] = purchase_quantity
 
-        if purchase_quantity < item_moq:
+        if 0 < purchase_quantity < item_moq:
             alert_if_purchase_quantity_exceeds_moq(missing_quantity, purchase_quantity, item_moq)
 
         return purchase_quantity
+
+    def check_if_item_needs_purchase_before_leadtime(self, CPD_MP, first_missing_date):
+        self.dados["leadtime"] = int(self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]==CPD_MP, "LEADTIME"].iloc[0]) * 7
+
+        item_leadtime_deadline_date = datetime.today() + timedelta(days=self.dados["leadtime"])
+
+        if first_missing_date < item_leadtime_deadline_date:
+            self.dados["item_needs_purchase_before_leadtime"] = True
+            return True
+        else:
+            return False
