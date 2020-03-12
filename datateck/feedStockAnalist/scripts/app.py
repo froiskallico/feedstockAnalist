@@ -473,6 +473,8 @@ class App(object):
             # Define a primeira data em que haverá falta de MP
             pri_data_falta = self.datas_falta["ENTREGA"].min()
 
+            self.dados["first_missing_date_balance"] = float(a.tl.loc[a.tl["ENTREGA"]==pri_data_falta, "SALDO_FINAL"].iloc[0])
+
             self.check_if_item_needs_purchase_before_leadtime(CPD_MP=CPD_MP, first_missing_date=pri_data_falta)
 
             # Filtra as OPs pendentes da Matéria Prima que têm suas datas de entrega após a primeira data em que haverá falta de MP
@@ -690,6 +692,15 @@ class App(object):
             self.dados["how_much_costs_the_purchasing_that_exceeds_missing_quantity"] = self.dados["how_much_purchasing_exceeds_missing_quantity"] * item_unitary_price
             return True
 
+        def alert_if_purchase_quantity_exceeds_max_stock(purchase_quantity, max_stock):
+            self.dados["purchase_quantity_exceeds_max_stock_alert"] = True
+            self.dados["how_much_purchasing_exceeds_max_stock"] = purchase_quantity - max_stock
+
+            item_unitary_price = self.feedstock_to_analyze.loc[self.feedstock_to_analyze["CPD_MP"]== CPD_MP, "CUSTO_MP"].iloc[0]
+
+            self.dados["how_much_costs_the_purchasing_that_exceeds_max_stock"] = self.dados["how_much_purchasing_exceeds_max_stock"] * item_unitary_price
+            return True
+
         max_stock = self.max_stock_calculation(CPD_MP)
 
         purchase_quantity = math.ceil(missing_quantity / item_moq) * item_moq
@@ -698,6 +709,11 @@ class App(object):
 
         if 0 < purchase_quantity < item_moq:
             alert_if_purchase_quantity_exceeds_moq(missing_quantity, purchase_quantity, item_moq)
+
+        self.dados["first_missing_date_final_balance_after_purchase"] = self.dados["first_missing_date_balance"] + purchase_quantity
+
+        if self.dados["first_missing_date_final_balance_after_purchase"] > max_stock:
+            alert_if_purchase_quantity_exceeds_max_stock(purchase_quantity, max_stock)
 
         return purchase_quantity
 
@@ -711,3 +727,4 @@ class App(object):
             return True
         else:
             return False
+
