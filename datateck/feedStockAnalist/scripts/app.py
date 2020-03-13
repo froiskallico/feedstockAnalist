@@ -701,7 +701,7 @@ class App(object):
         except:
             max_stock = 999999999
 
-        self.dados["max_stock"] = max_stoc
+        self.dados["max_stock"] = max_stock
 
 
         purchase_quantity = math.ceil(missing_quantity / item_moq) * item_moq
