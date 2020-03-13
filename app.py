@@ -684,17 +684,3 @@ class App(object):
 
         return purchase_quantity
 
-
-
-
-
-a = App()
-
-a.analyze(production_orders_to_analyze_list=114565)
-
-for key, value in a.report[7489.0].items():
-    print('{ %s : %s }'%(key, value))
-# %%
-
-
-# %%
