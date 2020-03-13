@@ -103,7 +103,7 @@ class NewAnalyzeView(generic.FormView):
         analyze.analyze(production_orders_to_analyze_list=production_orders_to_analyze)
         self.new_analyze.synthesis = analyze.synthesis
         self.new_analyze.save()
-        self.new_analyze.reports_set.create(report=analyze.save_to_json())
+        self.new_analyze.reports_set.create(report=analyze.report)
         return self.new_analyze.id
 
 class DeleteAnalyzeView(generic.DeleteView):

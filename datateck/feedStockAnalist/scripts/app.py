@@ -545,7 +545,7 @@ class App(object):
             self.dados["relatorio"] = self.ops_falta.reset_index().to_dict(
                 orient="records")
 
-            self.report[CPD_MP] = self.dados
+            self.report["{}".format(str(int(CPD_MP)))] = self.dados
 
     def check_purchases(self, CPD_MP, data_primeira_falta):
         return self.open_purchase_orders[self.open_purchase_orders["CPD_MP"] == CPD_MP].set_index("ENTREGA", drop=1).sort_values(by="ENTREGA", axis=0, ascending=True)[data_primeira_falta:].reset_index()

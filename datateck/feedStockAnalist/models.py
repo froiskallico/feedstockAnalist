@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from djongo.models import DictField
 
 from jsonfield import JSONField
 
@@ -12,4 +13,4 @@ class Analysis(models.Model):
 
 class Reports(models.Model):
     analysis = models.ForeignKey(Analysis, on_delete=models.CASCADE)
-    report = JSONField()
+    report = DictField()
