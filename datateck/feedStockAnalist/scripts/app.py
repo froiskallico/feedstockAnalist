@@ -496,6 +496,7 @@ class App(object):
 
             self.report_data = dict()
 
+            self.report_data["CPD"] = CPD_MP
             self.report_data["item_partnumber"] = get_item_partnumber(CPD_MP)
             self.report_data["moeda"] = get_item_currency(CPD_MP)
             self.report_data["custo_unit"] = get_item_unitary_cost(CPD_MP)
