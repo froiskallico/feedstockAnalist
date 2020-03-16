@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 
 from feedStockAnalist.scripts.app import App
 from feedStockAnalist.forms import CreateAnalyzeForm
-from .models import Analysis, Reports
+from .models import Analysis, MissingItems
 
 import json
 
@@ -40,11 +40,9 @@ class NewAnalyzeView(generic.FormView):
     success_url = reverse_lazy('feedStockAnalist:index')
 
     def form_valid(self, form):
-        self.synthesis = dict()
         self.new_analyze = Analysis(created_at=timezone.now())
         # try:
         production_orders_to_analyze_list = form.cleaned_data["production_orders_list"]
-        self.synthesis["production_orders_to_analyze_list"] = production_orders_to_analyze_list
         analyze_id = self.analyze(production_orders_to_analyze_list)
         send_mail(
         subject="feedstockAnalist - Análise finalizada com sucesso.",
@@ -91,22 +89,27 @@ class NewAnalyzeView(generic.FormView):
         return super(NewAnalyzeView, self).form_valid(form)
 
     def analyze(self, production_orders_to_analyze_list):
+
+        self.synthesis = dict()
+        self.synthesis["production_orders_to_analyze_list"] = production_orders_to_analyze_list
+
         analyze = App()
+
         items_to_analyze = analyze.get_list_of_items_to_analyze(production_orders_to_analyze_list=production_orders_to_analyze_list)
 
-        print(items_to_analyze)
         self.synthesis["items_to_analyze"] = items_to_analyze
         self.synthesis["feedstock_items_count"] = len(items_to_analyze)
         self.synthesis["missing_feedstock_items_count"] = 0
         self.synthesis["total_cost_of_actions"] = 0
+        self.new_analyze.synthesis = self.synthesis
+        self.new_analyze.save()
 
         for item in items_to_analyze:
-            self.new_analyze.missingitem_set.create(report = analyze.timeline(item)
+            self.new_analyze.missingitems_set.create(report = analyze.timeline(item))
 
 
         # self.new_analyze.reports_set.create(report=analyze.report)
-        self.new_analyze.synthesis = self.synthesis
-        self.new_analyze.save()
+        # self.new_analyze.save()
         return self.new_analyze.id
 
 
@@ -115,10 +118,10 @@ class DetailView(generic.TemplateView):
 
     def get_context_data(self, pk):
         analysis = Analysis.objects.get(pk=pk)
-        report = analysis.reports_set.filter(analysis__id=pk)[0]
+        # report = analysis.reports_set.filter(analysis__id=pk)[0]
         context = super(DetailView, self).get_context_data()
         context["synthesis"] = analysis.synthesis
-        context["report"] = report.report
+        # context["report"] = report.report
 
         return context
 

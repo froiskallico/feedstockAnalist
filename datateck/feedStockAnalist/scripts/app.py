@@ -559,7 +559,9 @@ class App(object):
 
             self.report_data["relatorio"] = production_orders_with_lack.reset_index().to_dict(orient="records")
 
-        return self.report_data
+            return self.report_data
+
+        return dict()
 
     def max_stock_calculation(self, CPD_MP):
         def get_item_parameters(CPD_MP):
