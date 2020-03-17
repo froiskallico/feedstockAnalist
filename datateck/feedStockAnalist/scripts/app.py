@@ -315,8 +315,7 @@ class App(object):
         ) if self.read_from_csv else fetch_data_from_database()
 
         # Normliza as datas para formato DateTime
-        self.ops_pendentes["ENTREGA"] = pd.to_datetime(
-            self.ops_pendentes["ENTREGA"])
+        self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"])
 
         self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna(
         )]
@@ -731,14 +730,3 @@ class App(object):
             alert_if_purchase_quantity_exceeds_max_stock(purchase_quantity, max_stock)
 
         return purchase_quantity
-
-
-# %%
-a = App()
-
-items = a.get_list_of_items_to_analyze(False, 114562)
-
-# %%
-a.timeline(907)
-
-# %%
