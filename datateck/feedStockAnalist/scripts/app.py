@@ -543,18 +543,18 @@ class App(object):
                     self.report_data["ocs_para_antecipar"] = self.anticipable_purchase_orders.to_dict(orient="records")
 
                     self.report_data["quantidade_antecipar"] = self.anticipable_purchase_orders["QTD_PENDENTE_OC"].sum()
-                    self.report_data["custo_acao_antecipar"] = self.report_data["quantidade_antecipar"] * get_item_unitary_cost()
+                    self.report_data["custo_acao_antecipar"] = self.report_data["quantidade_antecipar"] * get_item_unitary_cost(CPD_MP)
 
-                    remaining_missing_quantity = get_total_missing_quantity() - self.report_data["quantidade_antecipar"]
+                    remaining_missing_quantity = get_total_missing_quantity(CPD_MP) - self.report_data["quantidade_antecipar"]
 
                     self.report_data["quantidade_comprar"] = self.get_purchase_quantity(CPD_MP=CPD_MP, missing_quantity=remaining_missing_quantity)
-                    self.report_data["custo_acao_comprar"] = self.report_data["quantidade_comprar"] * get_item_unitary_cost()
+                    self.report_data["custo_acao_comprar"] = self.report_data["quantidade_comprar"] * get_item_unitary_cost(CPD_MP)
 
             else:
                 self.report_data["acao_sugerida"] = "Comprar"
 
-                self.report_data["quantidade_comprar"] = self.get_purchase_quantity(CPD_MP=CPD_MP, missing_quantity=get_total_missing_quantity())
-                self.report_data["custo_acao_comprar"] = self.report_data["quantidade_comprar"] * get_item_unitary_cost()
+                self.report_data["quantidade_comprar"] = self.get_purchase_quantity(CPD_MP=CPD_MP, missing_quantity=get_total_missing_quantity(CPD_MP))
+                self.report_data["custo_acao_comprar"] = self.report_data["quantidade_comprar"] * get_item_unitary_cost(CPD_MP)
 
             production_orders_with_lack = get_productions_orders_with_lack(CPD_MP)
 

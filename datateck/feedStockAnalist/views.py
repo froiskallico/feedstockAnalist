@@ -91,7 +91,6 @@ class NewAnalyzeView(generic.FormView):
         return super(NewAnalyzeView, self).form_valid(form)
 
     def analyze(self, production_orders_to_analyze_list):
-
         self.synthesis = dict()
         self.synthesis["production_orders_to_analyze_list"] = production_orders_to_analyze_list
 
@@ -107,11 +106,10 @@ class NewAnalyzeView(generic.FormView):
         self.new_analyze.save()
 
         for item in items_to_analyze:
-            self.new_analyze.missingitems_set.create(report = analyze.timeline(item))
+            report = analyze.timeline(item)
+            if len(report) > 0:
+                self.new_analyze.missingitems_set.create(report = report)
 
-
-        # self.new_analyze.reports_set.create(report=analyze.report)
-        # self.new_analyze.save()
         return self.new_analyze.id
 
 
@@ -121,10 +119,10 @@ class DetailView(generic.TemplateView):
     def get_context_data(self, pk):
         analysis = Analysis.objects.get(pk=pk)
         report = analysis.missingitems_set.filter(analysis__id=pk)
-        print(report)
         context = super(DetailView, self).get_context_data()
         context["synthesis"] = analysis.synthesis
         context["report"] = report
+
 
         return context
 
