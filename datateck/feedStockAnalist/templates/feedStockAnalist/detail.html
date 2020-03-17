@@ -26,11 +26,12 @@
         <hr class="hr-light" />
     </header>
 
-    {{ report }}
+    {% for item in report %}
+    {{item.report}}
+    {% endfor %}
 
     <section>
         {% if report %}
-
 
         <p class="lead">Itens com falta iminente:</p>
         <div id="reportAccordian" role="tablist" aria-multiselectable="true">
