@@ -108,7 +108,16 @@ class NewAnalyzeView(generic.FormView):
         for item in items_to_analyze:
             report = analyze.timeline(item)
             if len(report) > 0:
+                if "custo_acao_comprar" in report.keys():
+                    self.synthesis["total_cost_of_actions"] += report["custo_acao_comprar"]
+
+                if "custo_acao_antecipar" in report.keys():
+                    self.synthesis["total_cost_of_actions"] += report["custo_acao_antecipar"]
+
+                self.synthesis["missing_feedstock_items_count"] += 1
                 self.new_analyze.missingitems_set.create(report = report)
+
+        self.new_analyze.save()
 
         return self.new_analyze.id
 
