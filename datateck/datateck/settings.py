@@ -25,7 +25,7 @@ SECRET_KEY = 'm5(j+837^xo8gkn+_l%1ox*&p_!(#$qwnydbq(h_614tp_dby6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.117', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.1.117', '127.0.0.1','192.168.1.240']
 
 
 # Application definition
@@ -78,9 +78,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'feedStockAnalist',
-        'HOST': 'mongodb+srv://datateck:Data2803@datateck0-yjact.mongodb.net/feedStockAnalist?retryWrites=true',
+        'HOST': '192.168.1.240',
         'USER': 'datateck',
-        'PASSWORD': 'Data2803',
+        'PASSWORD': 'Data2803.%',
     }
 }
 

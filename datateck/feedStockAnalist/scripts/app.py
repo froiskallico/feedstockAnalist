@@ -314,7 +314,7 @@ class App(object):
 
         # Normliza as datas para formato DateTime
         print(self.ops_pendentes["ENTREGA"].sort_values(0).unique())
-        self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"], dayfirst=True, format='%Y-%m-%d')
+        self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"]) #, dayfirst=True, format='%Y-%m-%d')
 
         self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna(
         )]
@@ -713,11 +713,7 @@ class App(object):
         except:
             max_stock = 999999999
 
-<<<<<<< HEAD
         self.report_data["max_stock"] = max_stock
-=======
-        self.dados["max_stock"] = max_stock
->>>>>>> 7cb1f41083fadc44a9acb622701ea22c02b9e18b
 
 
         purchase_quantity = math.ceil(missing_quantity / item_moq) * item_moq
@@ -733,13 +729,3 @@ class App(object):
             alert_if_purchase_quantity_exceeds_max_stock(purchase_quantity, max_stock)
 
         return purchase_quantity
-
-
-# %%
-
-a = App()
-
-a.get_list_of_items_to_analyze(False, 114969)
-
-
-# %%
