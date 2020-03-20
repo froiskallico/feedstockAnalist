@@ -10,10 +10,10 @@
     </header>
 
     <section>
-        {% if analysis_list %}
-        <div class="card m-3">
-            <div class="table-responsive">
-                <table class="table table-light table-hover table-striped">
+        <div class="card m-3 half-opacity rounded">
+            {% if analysis_list %}
+            <div class="table-responsive rounded">
+                <table class="table rounded table-light text-dark table-hover table-striped">
                     <thead>
                         <tr>
                             <th>OP</<th>
@@ -21,7 +21,7 @@
                             <th>Quantidade de Itens</th>
                             <th>Itens com falta</th>
                             <th>Custo das Ações</th>
-                            <th>Abrir</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody class='text-dark rounded'>
@@ -30,13 +30,13 @@
                             <td scope="row">{{ analyze.synthesis.production_orders_to_analyze_list }}</td>
                             <td>{{ analyze.created_at }}</td>
                             <td>{{ analyze.synthesis.feedstock_items_count }}</td>
-                            <!-- TODO: Here load and parse analyze.report fieldsa -->
-                            <td>{{ analyze.synthesis.fault_feedstock_items_count }}</td>
+                            <td>{{ analyze.synthesis.missing_feedstock_items_count }}</td>
                             <td>R$ {{ analyze.synthesis.total_cost_of_actions|floatformat:2 }}</td>
                             <td>
-                                <a href="{{ analyze.id }}" type="button" class="btn btn-outline-dark">
+                                <a href="detail/{{ analyze.id }}" type="button" class="btn btn-outline-dark">
                                     Abrir
                                 </a>
+                                <a href="/delete/{{ analyze.id }}" class="ml-3 text-dark"><i class="fa fa-trash"></i></a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -44,7 +44,7 @@
                 </table>
             </div>
             {% else %}
-            <div class="card text-white half-opacity text-center col-sm-5 mx-auto">
+            <div class="card text-light half-opacity text-center col-sm p-5 mx-auto">
                 <div class="card-body">
                     <h4 class="card-title">Nenhum análise ainda</h4>
                     <p class="card-text">Clique em nova análise para começar</p>

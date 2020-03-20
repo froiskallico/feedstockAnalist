@@ -1,0 +1,59 @@
+{% extends 'feedStockAnalist/base.html' %} {% block content %}
+
+<section
+    class="container half-opacity rounded p-4 col-sm-4 mx-auto my-auto row"
+>
+    <form class="container mx-auto text-center text-light" method="post">
+        {% csrf_token %}
+        <p>
+            Tem certeza que deseja excluir esta análise da OP{% if ',' in synthesis.production_orders_to_analyze_list %}S{% endif %} {{ object.synthesis.production_orders_to_analyze_list }}?
+        </p>
+        <p class="text-danger">Essa ação não poderá ser desfeita</p>
+        <input
+            type="submit"
+            value="Confirmar"
+            class="btn btn-success"
+            data-toggle="modal"
+            data-target="#loadingModalCenter"
+        />
+
+    </form>
+</section>
+
+<div
+    class="modal fade text-center text-truncate"
+    id="loadingModalCenter"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="Excluindo"
+    aria-hidden="true"
+>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-wrap">
+                <h5 class="modal-title">
+                    Excluindo...
+                </h5>
+            </div>
+            <div class="modal-body text-wrap">
+                <div class="container-fluid">
+                    <h6>OK. Estamos excluindo esta análise.</h6>
+                    <iframe
+                        src="https://giphy.com/embed/acttIrNAHaoco"
+                        class="loading-img"
+                    ></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#exampleModal").on("show.bs.modal", event => {
+        var button = $(event.relatedTarget);
+        var modal = $(this);
+        // Use above variables to manipulate the DOM
+    });
+</script>
+
+{% endblock %}

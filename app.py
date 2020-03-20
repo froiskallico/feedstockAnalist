@@ -683,4 +683,3 @@ class App(object):
             alert_if_purchase_quantity_exceeds_moq(missing_quantity, purchase_quantity, item_moq)
 
         return purchase_quantity
-
