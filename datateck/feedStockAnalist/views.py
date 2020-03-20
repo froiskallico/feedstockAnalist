@@ -62,31 +62,29 @@ class NewAnalyzeView(generic.FormView):
                 str(form.cleaned_data["production_orders_list"]),
                 str(analyze_id)
             ),
-        from_email="froiskallico@gmail.com",
+        from_email="tri.inovacao@gmail.com",
         recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
         )
         # except Exception as e:
-        #     print(e)
-        #     send_mail(
-        #     subject="feedstockAnalist - Deu merda!",
-        #     message="""
-        #         Oi.
-        #         \n
-        #         \n
-        #         Vim aqui só pra te avisar que a tua análise
-        #         pra(s) OP(s) {} não foi concluída com sucesso.
-        #         Tente novamente acessando: http://192.168.1.117:80/new
-        #         \n
-        #         \n
-        #         {}
+            # print(e)
+            # send_mail(
+            # subject="feedstockAnalist - Deu merda!",
+            # message="""
+            #     Oi.
 
-        #         """.format(
-        #             str(form.cleaned_data["production_orders_list"]),
-        #             str(e)
-        #         ),
-        #     from_email="froiskallico@gmail.com",
-        #     recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
-        #     )
+            #     Vim aqui só pra te avisar que a tua análise
+            #     pra(s) OP(s) {} não foi concluída com sucesso.
+            #     Tente novamente acessando: http://192.168.1.117:80/new
+
+            #     Detalhes do erro: {}
+
+            #     """.format(
+            #         str(form.cleaned_data["production_orders_list"]),
+            #         str(e)
+            #     ),
+            # from_email="tri.inovacao@gmail.com",
+            # recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
+            # )
 
         return super(NewAnalyzeView, self).form_valid(form)
 
