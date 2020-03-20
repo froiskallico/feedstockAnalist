@@ -1,0 +1,301 @@
+{% extends 'feedStockAnalist/base.html' %}
+
+{% block content %}
+<div class="jumbotron jumbotron-fluid col-12 half-opacity text-light p-3">
+    <header>
+        <div class="container-fluid">
+            <h1 class="display-4">OP{% if ',' in synthesis.production_orders_to_analyze_list %}S{% endif %}:
+                {{ synthesis.production_orders_to_analyze_list }}</h1>
+            <p class="lead">Resumo da análise:</p>
+            <div class="row rounded bg-light text-center text-dark">
+                <div class="col-sm">
+                    <p class="my-auto font-weight-bold">Itens analisados</p>
+                    <p class="my-auto">{{ synthesis.feedstock_items_count }}</p>
+                </div>
+                <div class="col-sm" style="background-color: #e0e0e0;">
+                    <p class="my-auto font-weight-bold">Itens com falta iminente</p>
+                    <p class="my-auto">{{ synthesis.missing_feedstock_items_count }}</p>
+                </div>
+                <div class="col-sm">
+                    <p class="my-auto font-weight-bold">Custo total das ações sugeridas</p>
+                    <p class="my-auto">R$ {{ synthesis.total_cost_of_actions|floatformat:2  }}</p>
+                </div>
+            </div>
+
+        </div>
+        <hr class="hr-light" />
+    </header>
+
+    <section>
+        {% if report %}
+
+        <p class="lead">Itens com falta iminente:</p>
+        <div id="reportAccordian" role="tablist" aria-multiselectable="true">
+            {% for item in report %}
+            <div class="card half-opacity text-light mb-1">
+                <div
+                class="card-header"
+                {% if item.report.item_needs_purchase_before_leadtime %}
+                style="box-shadow: rgba(255, 0, 0, 0.3) 0 0 0 100px inset;"
+                {% endif %}
+                role="tab"
+                id="section{{ forloop.counter }}HeaderId">
+                    <a
+                        class="text-light row"
+                        data-toggle="collapse"
+                        data-parent="#reportAccordian"
+                        href="#section{{ forloop.counter }}ContentId"
+                        aria-expanded="false"
+                        aria-controls="section{{ forloop.counter }}ContentId"
+                        onclick="toggleChevron({{ forloop.counter }})"
+                    >
+                        <h5>
+                            <i class="fas fa-chevron-down fa-fw mx-2" id="chevron-{{ forloop.counter }}">
+                            </i>
+                            <span class="badge badge-pill badge-dark text-light">
+                                {{ item.report.CPD|floatformat:"0" }}
+                            </span>
+                        </h5>
+                            <span class="item-title ml-2    ">
+                            <h5>{{ item.report.item_partnumber }}</h5>
+                        </span>
+                    </a>
+                </div>
+
+                <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel"
+                    aria-labelledby="section{{ forloop.counter }}HeaderId">
+
+                    <div class="card-body">
+                        <div class="row text-center text-light mx-2 rounded">
+                            <div class="col-sm rounded mx-1" style="background-color: #444;">
+                                <p class="my-auto font-weight-bold">Quantidade que faltará</p>
+                                <p class="my-auto">{{ item.report.quantidade_falta|floatformat:"0" }} pçs</p>
+                            </div>
+                            <div class="col-sm rounded mx-1" style="background-color: {% if item.report.purchase_quantity_exceeds_max_stock_alert %}#900{% else %}#333{% endif %};">
+                                <p class="my-auto font-weight-bold">Ação sugerida</p>
+                                <p class="my-auto">{{ item.report.acao_sugerida }}</p>
+                            </div>
+                            {% if item.report.custo_acao_antecipar > 0 %}
+                            <div class="col-sm rounded mx-1" style="background-color: #444;">
+                                <p class="my-auto font-weight-bold">Custo das Antecipações</p>
+                                <p class="my-auto">{{ item.report.moeda }} {{ item.report.custo_acao_antecipar|floatformat:2  }}</p>
+                            </div>
+                            {% endif %}
+                            {% if item.report.custo_acao_comprar > 0 %}
+                            <div class="col-sm rounded mx-1" style="background-color: #444;">
+                                <p class="my-auto font-weight-bold">Custo das Compras</p>
+                                <p class="my-auto">{{ item.report.moeda }} {{ item.report.custo_acao_comprar|floatformat:2  }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row my-4 mx-2" id="detail-reports-nav-pills">
+                            <div class="nav flex-column col-sm-2 nav-pills" id="v-pills-tab" role="tablist"
+                                aria-orientation="vertical">
+                                <a class="nav-link active" id="v-pills-timeline{{ forloop.counter }}-tab"
+                                    data-toggle="pill" href="#v-pills-timeline{{ forloop.counter }}" role="tab"
+                                    aria-controls="v-pills-timeline{{ forloop.counter }}"
+                                    aria-selected="true">Timeline</a>
+                                <a class="nav-link" id="v-pills-production-orders{{ forloop.counter }}-tab"
+                                    data-toggle="pill" href="#v-pills-production-orders{{ forloop.counter }}" role="tab"
+                                    aria-controls="v-pills-production-orders{{ forloop.counter }}"
+                                    aria-selected="false">OPs Faltantes</a>
+                                {% if item.report.ocs_futuras %}
+                                <a class="nav-link" id="v-pills-pending-purchase-orders{{ forloop.counter }}-tab"
+                                    data-toggle="pill" href="#v-pills-pending-purchase-orders{{ forloop.counter }}"
+                                    role="tab" aria-controls="v-pills-pending-purchase-orders{{ forloop.counter }}"
+                                    aria-selected="false">Orde{{ item.report.ocs_futuras|length|pluralize:"m,ns" }} de Compra
+                                    Pendente{{ item.report.ocs_futuras|length|pluralize }}</a>
+                                {% endif %}
+                                {% if item.report.ocs_para_antecipar %}
+                                <a class="nav-link" id="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}-tab"
+                                    data-toggle="pill"
+                                    href="#v-pills-purchase-orders-to-anticipate{{ forloop.counter }}" role="tab"
+                                    aria-controls="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}"
+                                    aria-selected="false">OC{{ item.report.ocs_para_antecipar|length|pluralize }} Para
+                                    Antecipar</a>
+                                {% endif %}
+                                {% if item.report.quantidade_comprar > 0 %}
+                                <a class="nav-link" id="v-pills-purchase-action{{ forloop.counter }}-tab"
+                                    data-toggle="pill" href="#v-pills-purchase-action{{ forloop.counter }}" role="tab"
+                                    aria-controls="v-pills-purchase-action{{ forloop.counter }}"
+                                    aria-selected="false">Comprar...</a>
+                                {% endif %}
+                            </div>
+
+                            <div class="tab-content col-sm-10" id="v-pills-tabContent">
+                                <div class="tab-pane fade show active" id="v-pills-timeline{{ forloop.counter }}"
+                                    role="tabpanel" aria-labelledby="v-pills-timeline{{ forloop.counter }}-tab">
+                                    <h5>Linha do tempo:</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped table-hover">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>Data</th>
+                                                    <th>Saldo Inicial</th>
+                                                    <th>Quantidade OC</th>
+                                                    <th>Comprometido</th>
+                                                    <th>Saldo Final</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for line in item.report.timeline %}
+                                                <tr {% if line.FALTA %}style="box-shadow: rgba(255, 0, 0, 0.40) 0 0 0 100px inset;"{% endif %}>
+                                                    <td scope="row">{{ line.ENTREGA|slice:":10" }}</td>
+                                                    <td>{{ line.SALDO_INICIAL|floatformat:"0" }}</td>
+                                                    <td>{{ line.QTD_PENDENTE_OC|floatformat:"0" }}</td>
+                                                    <td>{{ line.COMPROMETIDO|floatformat:"0" }}</td>
+                                                    <td>{{ line.SALDO_FINAL|floatformat:"0" }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="v-pills-production-orders{{ forloop.counter }}"
+                                    role="tabpanel"
+                                    aria-labelledby="v-pills-production-orders{{ forloop.counter }}-tab">
+                                    <h5>Relatório de OP{{ item.report.relatorio|length|pluralize }} que
+                                        haver{{ item.report.relatorio|length|pluralize:"á,ão" }}
+                                        falta{{ item.report.relatorio|length|pluralize }}</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped table-hover">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>Data Entrega</th>
+                                                    <th>Chicote</th>
+                                                    <th>OP</th>
+                                                    <th>Cliente</th>
+                                                    <th>Comprometido</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for op in item.report.relatorio %}
+                                                <tr>
+                                                    <td scope="row">{{ op.ENTREGA|slice:":10" }}</td>
+                                                    <td>{{ op.CODIGO_CHICOTE }}</td>
+                                                    <td>{{ op.OP|floatformat:"0" }}</td>
+                                                    <td>{{ op.CLIENTE }}</td>
+                                                    <td>{{ op.COMPROMETIDO|floatformat:"0" }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="v-pills-pending-purchase-orders{{ forloop.counter }}"
+                                    role="tabpanel"
+                                    aria-labelledby="v-pills-pending-purchase-orders{{ forloop.counter }}">
+                                    <h5>OC{{ item.report.ocs_futuras|length|pluralize }}
+                                        futura{{ item.report.ocs_futuras|length|pluralize }}</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped table-hover">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>Data Entrega</th>
+                                                    <th>OC</th>
+                                                    <th>Fornecedor</th>
+                                                    <th>Qtd. Pedente</th>
+                                                    <th>Moeda</th>
+                                                    <th>Valor OC</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for oc in item.report.ocs_futuras %}
+                                                <tr>
+                                                    <td scope="row">{{ oc.ENTREGA|slice:":10" }}</td>
+                                                    <td>{{ oc.OC|floatformat:"0" }}</td>
+                                                    <td>{{ oc.FORNECEDOR }}</td>
+                                                    <td>{{ oc.QTD_PENDENTE_OC|floatformat:"0" }}</td>
+                                                    <td>{{ oc.SIMBOLO }}</td>
+                                                    <td>{{ oc.VALOR_TOTAL|floatformat:2 }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade"
+                                    id="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}" role="tabpanel"
+                                    aria-labelledby="v-pills-purchase-orders-to-anticipate{{ forloop.counter }}">
+                                    <h5>OC{{ item.report.ocs_para_antecipar|length|pluralize }} Para Antecipar</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-dark table-striped table-hover">
+                                            <thead class="thead-inverse">
+                                                <tr>
+                                                    <th>Data Entrega</th>
+                                                    <th>OC</th>
+                                                    <th>Fornecedor</th>
+                                                    <th>Qtd. Pedente</th>
+                                                    <th>Moeda</th>
+                                                    <th>Valor OC</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for oc in item.report.ocs_para_antecipar %}
+                                                <tr>
+                                                    <td scope="row">{{ oc.ENTREGA|slice:":10" }}</td>
+                                                    <td>{{ oc.OC|floatformat:"0" }}</td>
+                                                    <td>{{ oc.FORNECEDOR }}</td>
+                                                    <td>{{ oc.QTD_PENDENTE_OC|floatformat:"0" }}</td>
+                                                    <td>{{ oc.SIMBOLO }}</td>
+                                                    <td>{{ oc.VALOR_TOTAL|floatformat:2 }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="v-pills-purchase-action{{ forloop.counter }}"
+                                    role="tabpanel" aria-labelledby="v-pills-purchase-action{{ forloop.counter }}">
+                                    <h3>Comprar:</h3>
+                                    <h5>Quantidade a comprar: {{ item.report.quantidade_comprar|floatformat:"0" }} pçs</h5>
+                                    <h5>Data da primeira falta: {{ item.report.first_lack_date_balance }}</h5>
+                                    <h5>Custo da ação comprar: {{ item.report.moeda }} {{ item.report.custo_acao_comprar|floatformat:2 }}</h5>
+                                    <h5>MOQ do item: {{ item.report.item_moq|floatformat:"0" }}</h5>
+
+                                    {% if item.report.purchase_quantity_exceeds_max_stock_alert %}
+                                    <br>
+                                    <h5>Estoque máximo: {{ item.report.max_stock|floatformat:"0" }}    </h5>
+                                    <h5>Quantidade Excedente: {{ item.report.how_much_purchasing_exceeds_max_stock|floatformat:"0" }} pçs</h5>
+                                    <h5>Valor da Quantidade Excedente: {{ item.report.moeda }} {{ item.report.how_much_costs_the_purchasing_that_exceeds_max_stock }}</h5>
+                                    {% endif %}
+
+                                    {% if item.report.purchase_quantity_exceeds_moq_alert %}
+                                    <br>
+                                    <h5>Quantidade Excedente: {{ item.report.how_much_purchasing_exceeds_missing_quantity|floatformat:"0" }} pçs</h5>
+                                    <h5>Valor da Quantidade Excedente: {{ item.report.moeda }} {{ item.report.how_much_costs_the_purchasing_that_exceeds_missing_quantity }}</h5>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {% endfor %}
+
+            {% else %}
+
+            <div class="text-center">
+                <h2>Parabéns!</h2>
+                <img class="m-3"
+                    src="https://media3.giphy.com/media/iUOzkJmvnFfqM/giphy.gif?cid=790b76118e457e61fa523a9b4a80dbbf4e3a8a6c13c64e2a&rid=giphy.gif"
+                    alt="">
+                <p>Não foi encontrada nenhuma falta!</p>
+            </div>
+
+            {% endif %}
+    </section>
+</div>
+
+<script>
+    function toggleChevron(id) {
+        icon_class_list = document.getElementById("chevron-"+id).classList;
+
+        icon_class_list.toggle("fa-chevron-down");
+        icon_class_list.toggle("fa-chevron-up");
+    }
+</script>
+{% endblock %}

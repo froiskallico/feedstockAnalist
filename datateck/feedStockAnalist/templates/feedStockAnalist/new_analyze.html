@@ -1,0 +1,49 @@
+{% extends 'feedStockAnalist/base.html' %} {% block content %}
+
+<section class="container half-opacity rounded p-4 col-sm-4 mx-auto my-auto row">
+    <form class="container mx-auto text-center" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_production_orders_list" class="text-light">
+                Ordens de produção para analisar:
+            </label>
+            <input type="text" name="production_orders_list" class="form-control form-control-lg"
+                placeholder="Separar por vírgulas. E.g: (123, 456)" required id="id_production_orders_list" />
+        </div>
+        <input type="submit" value="Iniciar nova análise" class="btn btn-success" data-toggle="modal"
+            data-target="#loadingModalCenter" />
+    </form>
+</section>
+
+<div class="modal fade text-center text-truncate" id="loadingModalCenter" tabindex="-1" role="dialog"
+    aria-labelledby="Criando" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-wrap">
+                <h5 class="modal-title">Estamos colocando os hamsters para correrem!</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-wrap">
+                <div class="container-fluid">
+                    <h6>Sua solicitação será processada em segundo plano.</h6>
+                    <img src="https://media3.giphy.com/media/pEhpnpkPlyP3q/giphy.gif?cid=790b7611a358db3efd259c88887f604583f386d217b6f0f2&rid=giphy.gif"
+                        alt="" class="loading-img">
+                    <p>Você pode fechar essa página e retornar à Home em alguns minutos ou aguarde para ser redirecionado para o resultado da análise.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#exampleModal').on('show.bs.modal', event => {
+        var button = $(event.relatedTarget);
+        var modal = $(this);
+        // Use above variables to manipulate the DOM
+
+    });
+</script>
+
+{% endblock %}

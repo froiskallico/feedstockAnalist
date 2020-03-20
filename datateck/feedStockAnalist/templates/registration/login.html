@@ -1,0 +1,26 @@
+{% extends 'registration/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row h-100">
+    <div class="container rounded bg-light py-4 my-auto mx-auto col-sm-4 text-center">
+        <img src="{% static 'fsa/logo.png' %}" alt="" class="" style="max-height: 100px;">
+        <h1 class="text-center font-weight-lighter text-break">feedStockAnalist</h1>
+        <h1 class="display-5">Login</h1>
+        <hr class="my-2">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <p class="lead">
+                <button type="submit" class="btn btn-success btn-lg">Login</button>
+            </p>
+            <a href="/signup">
+                <small class="text-muted">
+                    <p>Cadastre-se</p>
+                </small>
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}
