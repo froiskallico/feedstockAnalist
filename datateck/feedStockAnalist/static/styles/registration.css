@@ -1,0 +1,16 @@
+{% load static %}
+
+body {
+    background: url("../images/backgrounds/login.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.575);
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
