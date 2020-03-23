@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import json
+
+with open('/etc/config.json') as config_file:
+    config = json.load(config_file)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,12 +24,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'm5(j+837^xo8gkn+_l%1ox*&p_!(#$qwnydbq(h_614tp_dby6'
+SECRET_KEY = config['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.117', '127.0.0.1','192.168.1.240']
+ALLOWED_HOSTS = ['127.0.0.1','192.168.1.240']
 
 
 # Application definition
@@ -121,6 +125,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 LOGIN_URL = '/login/'
@@ -133,5 +138,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'tri.inovacao@gmail.com'
-EMAIL_HOST_PASSWORD = 'enesphbmrycojwnm'
+EMAIL_HOST_USER = config.get('EMAIL_USER')
+EMAIL_HOST_PASSWORD = config.get('EMAIL_PASS')
