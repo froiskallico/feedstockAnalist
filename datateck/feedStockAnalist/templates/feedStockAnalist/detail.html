@@ -1,7 +1,7 @@
 {% extends 'feedStockAnalist/base.html' %}
 
 {% block content %}
-<div class="jumbotron jumbotron-fluid col-12 half-opacity text-light p-3">
+<div class="jumbotron jumbotron-fluid col-12 half-opacity text-light p-3 rounded">
     <header>
         <div class="container-fluid">
             <h1 class="display-4">OP{% if ',' in synthesis.production_orders_to_analyze_list %}S{% endif %}:
@@ -25,8 +25,6 @@
         </div>
         <hr class="hr-light" />
     </header>
-
-    {{ object_list }}
 
     <section>
         {% if report %}
@@ -290,7 +288,34 @@
 
             {% endif %}
     </section>
+
+    <footer class="mt-4">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+              <a class="page-link " href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Anterior</span>
+              </a>
+            </li>
+
+            <li class="page-item disabled">
+            <div class="page-link">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </div>
+            </li>
+
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+              <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Próxima</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+    </footer>
 </div>
+
 
 <script>
     function toggleChevron(id) {
