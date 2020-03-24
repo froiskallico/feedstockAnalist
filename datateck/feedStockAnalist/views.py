@@ -21,12 +21,6 @@ class IndexView(generic.ListView):
         analysis_from_db = Analysis.objects.all()
         return analysis_from_db
 
-        # for analyze in analysis_from_db:
-        #     analyze_converted = self.convert_analyze_report_from_json_to_dict(analyze)
-        #     queryset.append(analyze_converted)
-
-        # return queryset
-
     def convert_analyze_report_from_json_to_dict(self, analyze):
         analyze_report_as_dict = json.loads(analyze.report)
         analyze_parsed = analyze
@@ -42,49 +36,49 @@ class NewAnalyzeView(generic.FormView):
     def form_valid(self, form):
         self.new_analyze = Analysis(created_at=timezone.now())
 
-        # try:
-        production_orders_to_analyze_list = form.cleaned_data["production_orders_list"]
-        analyze_id = self.analyze(production_orders_to_analyze_list)
-        send_mail(
-        subject="feedstockAnalist - Análise finalizada com sucesso.",
-        message="""
-            Oi.
-            \n
-            \n
-            Vim aqui só pra te avisar que a tua análise
-            pra(s) OP(s) {} foi concluída com sucesso e já
-            está disponível.
-            \n
-            \n
-            Use o link http://192.168.1.117:80/detail/{}
-            para acessá-la diretamente.
-            """.format(
-                str(form.cleaned_data["production_orders_list"]),
-                str(analyze_id)
-            ),
-        from_email="tri.inovacao@gmail.com",
-        recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
-        )
-        # except Exception as e:
-            # print(e)
-            # send_mail(
-            # subject="feedstockAnalist - Deu merda!",
-            # message="""
-            #     Oi.
+        try:
+            production_orders_to_analyze_list = form.cleaned_data["production_orders_list"]
+            analyze_id = self.analyze(production_orders_to_analyze_list)
+            send_mail(
+            subject="feedstockAnalist - Análise finalizada com sucesso.",
+            message="""
+                Oi.
+                \n
+                \n
+                Vim aqui só pra te avisar que a tua análise
+                pra(s) OP(s) {} foi concluída com sucesso e já
+                está disponível.
+                \n
+                \n
+                Use o link http://192.168.1.117:80/detail/{}
+                para acessá-la diretamente.
+                """.format(
+                    str(form.cleaned_data["production_orders_list"]),
+                    str(analyze_id)
+                ),
+            from_email="tri.inovacao@gmail.com",
+            recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
+            )
+        except Exception as e:
+            print(e)
+            send_mail(
+            subject="feedstockAnalist - Deu merda!",
+            message="""
+                Oi.
 
-            #     Vim aqui só pra te avisar que a tua análise
-            #     pra(s) OP(s) {} não foi concluída com sucesso.
-            #     Tente novamente acessando: http://192.168.1.117:80/new
+                Vim aqui só pra te avisar que a tua análise
+                pra(s) OP(s) {} não foi concluída com sucesso.
+                Tente novamente acessando: http://192.168.1.117:80/new
 
-            #     Detalhes do erro: {}
+                Detalhes do erro: {}
 
-            #     """.format(
-            #         str(form.cleaned_data["production_orders_list"]),
-            #         str(e)
-            #     ),
-            # from_email="tri.inovacao@gmail.com",
-            # recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
-            # )
+                """.format(
+                    str(form.cleaned_data["production_orders_list"]),
+                    str(e)
+                ),
+            from_email="tri.inovacao@gmail.com",
+            recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
+            )
 
         return super(NewAnalyzeView, self).form_valid(form)
 
