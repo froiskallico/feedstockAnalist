@@ -120,16 +120,22 @@ class NewAnalyzeView(generic.FormView):
         return self.new_analyze.id
 
 
-class DetailView(generic.TemplateView):
+class DetailView(generic.ListView):
     template_name = 'feedStockAnalist/detail.html'
+    context_object_name = 'report'
+    paginate_by = 10
 
-    def get_context_data(self, pk):
+    def get_queryset(self):
+        queryset = MissingItems.objects.filter(analysis__id = self.kwargs["pk"])
+        return queryset
+
+    def get_context_data(self):
+        context = super().get_context_data()
+
+        pk = self.kwargs["pk"]
+
         analysis = Analysis.objects.get(pk=pk)
-        report = analysis.missingitems_set.filter(analysis__id=pk)
-        context = super(DetailView, self).get_context_data()
         context["synthesis"] = analysis.synthesis
-        context["report"] = report
-
 
         return context
 
