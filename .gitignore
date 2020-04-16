@@ -113,6 +113,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+config.json
 
 # Spyder project settings
 .spyderproject
@@ -141,3 +142,4 @@ cython_debug/
 # static files generated from Django application using `collectstatic`
 # media
 # static
+
