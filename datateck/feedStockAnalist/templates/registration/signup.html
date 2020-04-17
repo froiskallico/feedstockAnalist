@@ -10,38 +10,44 @@
         <hr class="my-2">
         <form method="post" class="text-center w-50 mx-auto">
             {% csrf_token %}
-            <div class="form-group">
+
+
+
+            <div class="form-group text-left">
                 <label for="id_username">Usuário:</label>
-                <input type="text" class="form-control w-75 mx-auto text-break" name="username" id="id_username"
-                    aria-describedby="Nome de Usuário" placeholder="Digite um nome de usuário...">
+                <input type="text" class="form-control w-75 text-break" name="username" id="id_username"
+                aria-describedby="Nome de Usuário" placeholder="Digite um nome de usuário..." required>
                 <small id="Nome de Usuário" class="form-text text-muted">
                     Máximo 150 caracteres. Apenas: Letras, números e @/./+/-/_
                 </small>
             </div>
 
-            <div class="form-group">
+            <div class="form-group text-left">
+                <label for="id_email">Email:</label>
+                <input type="email" class="form-control w-75 text-break" name="email" id="id_email"
+                aria-describedby="Email" placeholder="Digite seu email." required>
+            </div>
+
+            <div class="form-group text-left">
                 <label for="id_password1">Senha:</label>
-                <input type="password" class="form-control w-50 mx-auto" name="password1" id="id_password1"
-                    placeholder="Digite sua senha...">
-                <small id="Senha" class="form-text text-muted">
-                    <ul>
-                        <li>Sua senha não pode ser tão parecida com suas outras informações pessoais.</li>
-                        <li>Sua senha precisa conter pelo menos 8 caracteres.</li>
-                        <li>Sua senha não pode ser uma senha habitualmente utilizada.</li>
-                        <li>Sua senha não pode ser inteiramente numérica.</li>
-                    </ul>
+                <input type="password" class="form-control w-50" name="password1" id="id_password1"
+                    placeholder="Digite sua senha..." required>
+                    <small id="Senha" class="form-text text-muted">
+                    Mínimo 8 caracteres. Deve conter <strong>Letras e Números</strong>.
+
                 </small>
             </div>
 
-            <div class="form-group">
+            <div class="form-group text-left">
                 <label for="id_password2">Confirmação de Senha:</label>
-                <input type="password" class="form-control w-50 mx-auto" name="password2" id="id_password2"
-                    placeholder="Confirme sua senha...">
-                <small id="Senha" class="form-text text-muted">
-                    Informe a mesma senha informada anteriormente, para
-                    verificação.
-                </small>
+                <input type="password" class="form-control w-50" name="password2" id="id_password2"
+                placeholder="Confirme sua senha..." required>
             </div>
+            {% if form.password2.errors %}
+            <small id="errors" class="text-muted text-danger">
+                {{ form.password2.errors }}
+            </small>
+            {% endif %}
 
             <p class="lead">
                 <button type="submit" class="btn btn-success btn-lg">Registrar</button>
