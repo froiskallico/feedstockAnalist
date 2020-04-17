@@ -8,9 +8,6 @@ class RegisterView(generic.FormView):
     form_class = SignUpForm
     success_url = reverse_lazy('login')
 
-    def form_invalid():
-
-
     def form_valid(self, form):
         form.save()
         return super(RegisterView, self).form_valid(form)
