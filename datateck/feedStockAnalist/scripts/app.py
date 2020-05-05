@@ -502,6 +502,8 @@ class App(object):
 
             self.lack_dates = get_lack_dates()
 
+            self.report_data["first_lack_date"] = get_first_lack_date()
+
             self.report_data["first_lack_date_balance"] = get_first_lack_date_balance()
 
             check_if_item_needs_purchase_before_leadtime(CPD_MP=CPD_MP, first_lack_date=get_first_lack_date())
