@@ -86,9 +86,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'feedStockAnalist',
-        'HOST': '192.168.1.240',
+        'HOST': 'mongodb+srv://datateck:6qSBcQWeTfBWzG0F@tri-cluster0-piuhh.mongodb.net/test?retryWrites=true&w=majority',
         'USER': 'datateck',
-        'PASSWORD': 'Data2803.%',
+        'PASSWORD': '6qSBcQWeTfBWzG0F',
     }
 }
 
