@@ -12,11 +12,12 @@
     <section>
         <div class="card m-3 half-opacity rounded">
             {% if analysis_list %}
-            <div class="table-responsive rounded">
+            <div class="table-responsive table-sm rounded">
                 <table class="table rounded table-light text-dark table-hover table-striped">
                     <thead>
                         <tr>
-                            <th>OP</<th>
+                            <th>OP</th>
+                            <th>Criado por</th>
                             <th>Data da Análise</th>
                             <th>Quantidade de Itens</th>
                             <th>Itens com falta</th>
@@ -28,6 +29,7 @@
                         {% for analyze in analysis_list %}
                         <tr>
                             <td scope="row">{{ analyze.synthesis.production_orders_to_analyze_list }}</td>
+                            <td>{{ analyze.created_by.first_name }} {{ analyze.created_by.last_name }}</td>
                             <td>{{ analyze.created_at }}</td>
                             <td>{{ analyze.synthesis.feedstock_items_count }}</td>
                             <td>{{ analyze.synthesis.missing_feedstock_items_count }}</td>

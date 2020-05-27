@@ -1,11 +1,11 @@
 
 from django.urls import reverse_lazy
 from django.views import generic
-from django.contrib.auth.forms import UserCreationForm
+from datateck.forms import SignUpForm
 
 class RegisterView(generic.FormView):
     template_name = 'registration/signup.html'
-    form_class = UserCreationForm
+    form_class = SignUpForm
     success_url = reverse_lazy('login')
 
     def form_valid(self, form):

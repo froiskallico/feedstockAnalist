@@ -313,7 +313,6 @@ class App(object):
         ) if self.read_from_csv else fetch_data_from_database()
 
         # Normliza as datas para formato DateTime
-        print(self.ops_pendentes["ENTREGA"].sort_values(0).unique())
         self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"]) #, dayfirst=True, format='%Y-%m-%d')
 
         self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna(
@@ -502,6 +501,8 @@ class App(object):
             self.report_data["timeline"] = self.tl.reset_index().to_dict(orient="records")
 
             self.lack_dates = get_lack_dates()
+
+            self.report_data["first_lack_date"] = get_first_lack_date()
 
             self.report_data["first_lack_date_balance"] = get_first_lack_date_balance()
 

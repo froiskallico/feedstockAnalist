@@ -141,7 +141,7 @@
                                             <tbody>
                                                 {% for line in item.report.timeline %}
                                                 <tr {% if line.FALTA %}style="box-shadow: rgba(255, 0, 0, 0.40) 0 0 0 100px inset;"{% endif %}>
-                                                    <td scope="row">{{ line.ENTREGA|slice:":10" }}</td>
+                                                    <td scope="row">{{ line.ENTREGA|date:"SHORT_DATE_FORMAT" }}</td>
                                                     <td>{{ line.SALDO_INICIAL|floatformat:"0" }}</td>
                                                     <td>{{ line.QTD_PENDENTE_OC|floatformat:"0" }}</td>
                                                     <td>{{ line.COMPROMETIDO|floatformat:"0" }}</td>
@@ -172,7 +172,7 @@
                                             <tbody>
                                                 {% for op in item.report.relatorio %}
                                                 <tr>
-                                                    <td scope="row">{{ op.ENTREGA|slice:":10" }}</td>
+                                                    <td scope="row">{{ op.ENTREGA|date:"SHORT_DATE_FORMAT" }}</td>
                                                     <td>{{ op.CODIGO_CHICOTE }}</td>
                                                     <td>{{ op.OP|floatformat:"0" }}</td>
                                                     <td>{{ op.CLIENTE }}</td>
@@ -203,7 +203,7 @@
                                             <tbody>
                                                 {% for oc in item.report.ocs_futuras %}
                                                 <tr>
-                                                    <td scope="row">{{ oc.ENTREGA|slice:":10" }}</td>
+                                                    <td scope="row">{{ oc.ENTREGA|date:"SHORT_DATE_FORMAT" }}</td>
                                                     <td>{{ oc.OC|floatformat:"0" }}</td>
                                                     <td>{{ oc.FORNECEDOR }}</td>
                                                     <td>{{ oc.QTD_PENDENTE_OC|floatformat:"0" }}</td>
@@ -234,7 +234,7 @@
                                             <tbody>
                                                 {% for oc in item.report.ocs_para_antecipar %}
                                                 <tr>
-                                                    <td scope="row">{{ oc.ENTREGA|slice:":10" }}</td>
+                                                    <td scope="row">{{ oc.ENTREGA|date:"SHORT_DATE_FORMAT" }}</td>
                                                     <td>{{ oc.OC|floatformat:"0" }}</td>
                                                     <td>{{ oc.FORNECEDOR }}</td>
                                                     <td>{{ oc.QTD_PENDENTE_OC|floatformat:"0" }}</td>
@@ -250,7 +250,7 @@
                                     role="tabpanel" aria-labelledby="v-pills-purchase-action{{ forloop.counter }}">
                                     <h3>Comprar:</h3>
                                     <h5>Quantidade a comprar: {{ item.report.quantidade_comprar|floatformat:"0" }} pçs</h5>
-                                    <h5>Data da primeira falta: {{ item.report.first_lack_date_balance }}</h5>
+                                    <h5>Data da primeira falta: {{ item.report.first_lack_date|date }}</h5>
                                     <h5>Custo da ação comprar: {{ item.report.moeda }} {{ item.report.custo_acao_comprar|floatformat:2 }}</h5>
                                     <h5>MOQ do item: {{ item.report.item_moq|floatformat:"0" }}</h5>
 
@@ -258,7 +258,7 @@
                                     <br>
                                     <h5>Estoque máximo: {{ item.report.max_stock|floatformat:"0" }}    </h5>
                                     <h5>Quantidade Excedente: {{ item.report.how_much_purchasing_exceeds_max_stock|floatformat:"0" }} pçs</h5>
-                                    <h5>Valor da Quantidade Excedente: {{ item.report.moeda }} {{ item.report.how_much_costs_the_purchasing_that_exceeds_max_stock }}</h5>
+                                    <h5>Valor da Quantidade Excedente: {{ item.report.moeda }} {{ item.report.how_much_costs_the_purchasing_that_exceeds_max_stock|floatformat:"2" }}</h5>
                                     {% endif %}
 
                                     {% if item.report.purchase_quantity_exceeds_moq_alert %}

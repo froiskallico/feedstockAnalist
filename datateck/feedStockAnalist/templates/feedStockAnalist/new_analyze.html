@@ -8,7 +8,8 @@
                 Ordens de produção para analisar:
             </label>
             <input type="text" name="production_orders_list" class="form-control form-control-lg"
-                placeholder="Separar por vírgulas. E.g: (123, 456)" required id="id_production_orders_list" />
+                placeholder="Ex: 123456, 654321..." required id="id_production_orders_list" />
+            <small class="text-muted">*Separar os números das OPs por vírgulas</small>
         </div>
         <input type="submit" value="Iniciar nova análise" class="btn btn-success" data-toggle="modal"
             data-target="#loadingModalCenter" />
@@ -30,7 +31,8 @@
                     <h6>Sua solicitação será processada em segundo plano.</h6>
                     <img src="https://media3.giphy.com/media/pEhpnpkPlyP3q/giphy.gif?cid=790b7611a358db3efd259c88887f604583f386d217b6f0f2&rid=giphy.gif"
                         alt="" class="loading-img">
-                    <p>Você pode fechar essa página e retornar à Home em alguns minutos ou aguarde para ser redirecionado para o resultado da análise.</p>
+                    <p>Você pode fechar essa página.</p>
+                    <p><strong>Iremos enviar um email quando a análise estiver pronta</strong></br>ou aguarde para ser redirecionado para o resultado da análise.</p>
                 </div>
             </div>
         </div>
@@ -41,7 +43,6 @@
     $('#exampleModal').on('show.bs.modal', event => {
         var button = $(event.relatedTarget);
         var modal = $(this);
-        // Use above variables to manipulate the DOM
 
     });
 </script>

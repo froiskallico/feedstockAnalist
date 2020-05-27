@@ -1,11 +1,17 @@
 from pathlib import Path
-from dotenv import load_dotenv
 import fdb
 import os
-
 import json
 
-with open('/etc/config.json') as config_file:
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+if DEBUG:
+    config_file_path = './config.json'
+else:
+    config_file_path = '/etc/config.json'
+
+with open(config_file_path) as config_file:
     config = json.load(config_file)
 
 class Database(object):

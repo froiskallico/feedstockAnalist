@@ -10,37 +10,54 @@
         <hr class="my-2">
         <form method="post" class="text-center w-50 mx-auto">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="id_username">Usuário:</label>
-                <input type="text" class="form-control w-75 mx-auto text-break" name="username" id="id_username"
-                    aria-describedby="Nome de Usuário" placeholder="Digite um nome de usuário...">
-                <small id="Nome de Usuário" class="form-text text-muted">
-                    Máximo 150 caracteres. Apenas: Letras, números e @/./+/-/_
-                </small>
+
+
+
+            <div class="form-group text-left">
+                <label for="id_username" class="font-weight-bold">Usuário:</label>
+                <input type="text" class="form-control text-break form-control-sm" name="username" id="id_username"
+                aria-describedby="Nome de Usuário" placeholder="Digite um nome de usuário..." required>
             </div>
 
-            <div class="form-group">
-                <label for="id_password1">Senha:</label>
-                <input type="password" class="form-control w-50 mx-auto" name="password1" id="id_password1"
-                    placeholder="Digite sua senha...">
-                <small id="Senha" class="form-text text-muted">
-                    <ul>
-                        <li>Sua senha não pode ser tão parecida com suas outras informações pessoais.</li>
-                        <li>Sua senha precisa conter pelo menos 8 caracteres.</li>
-                        <li>Sua senha não pode ser uma senha habitualmente utilizada.</li>
-                        <li>Sua senha não pode ser inteiramente numérica.</li>
-                    </ul>
-                </small>
+            <div class="form-row">
+                <div class="form-group col text-left">
+                    <input type="text" class="form-control form-control-sm" name="first_name" id="id_first_name"
+                    placeholder="Nome..." required>
+                </div>
+
+                <div class="form-group col text-left">
+                    <input type="text" class="form-control form-control-sm " name="last_name" id="id_last_name"
+                    placeholder="Sobrenome..." required>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="id_password2">Confirmação de Senha:</label>
-                <input type="password" class="form-control w-50 mx-auto" name="password2" id="id_password2"
-                    placeholder="Confirme sua senha...">
-                <small id="Senha" class="form-text text-muted">
-                    Informe a mesma senha informada anteriormente, para
-                    verificação.
-                </small>
+            <div class="form-group text-left">
+                <label for="id_email" class="font-weight-bold">Email:</label>
+                <input type="email" class="form-control text-break form-control-sm" name="email" id="id_email"
+                aria-describedby="Email" placeholder="Digite seu email." required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col text-left">
+                    <label for="id_password1" class="font-weight-bold">Senha:</label>
+                    <input type="password" class="form-control form-control-sm" name="password1" id="id_password1"
+                        placeholder="Digite sua senha..." required>
+                    <small id="Senha" class="form-text text-muted">
+                        Mínimo 8 caracteres.</br> Deve conter <strong>Letras e Números</strong>.
+                    </small>
+                </div>
+
+                <div class="form-group col text-left">
+                    <label for="id_password2" class="font-weight-bold">Confirmação de Senha:</label>
+                    <input type="password" class="form-control form-control-sm" name="password2" id="id_password2"
+                    placeholder="Confirme sua senha..." required>
+
+                    {% if form.password2.errors %}
+                    <small id="errors" class="text-danger">
+                        {{ form.password2.errors }}
+                    </small>
+                    {% endif %}
+                </div>
             </div>
 
             <p class="lead">
