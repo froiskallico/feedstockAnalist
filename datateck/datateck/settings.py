@@ -33,7 +33,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config['SECRET_KEY']
 
-ALLOWED_HOSTS = ['127.0.0.1','192.168.1.240']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -85,10 +85,13 @@ WSGI_APPLICATION = 'datateck.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'feedStockAnalist',
-        'HOST': 'mongodb+srv://datateck:6qSBcQWeTfBWzG0F@tri-cluster0-piuhh.mongodb.net/test?retryWrites=true&w=majority',
-        'USER': 'datateck',
-        'PASSWORD': '6qSBcQWeTfBWzG0F',
+        'CLIENT': {
+            'name': 'feedStockAnalist',
+            'host': 'mongodb+srv://datateck:aWPxT2M84IpEyzIS@tri-cluster0-piuhh.mongodb.net/test?retryWrites=true',
+            'username': 'datateck',
+            'password': 'aWPxT2M84IpEyzIS',
+            'authMechanism': 'SCRAM-SHA-1'
+        }
     }
 }
 
