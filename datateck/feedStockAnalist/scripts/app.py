@@ -317,6 +317,10 @@ class App(object):
 
         self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna(
         )]
+
+        self.ops_sem_data_com_semana.to_csv('./extracao.csv')
+        self.ops_pendentes.to_csv("./ops_pendentes.csv")
+
         self.ops_sem_data_com_semana["NSEM"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(
             0, 2).astype(int)
         self.ops_sem_data_com_semana["NANO"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(
