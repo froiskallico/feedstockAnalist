@@ -34,9 +34,10 @@
             {% for item in report %}
             <div class="card half-opacity text-light mb-1">
                 <div
-                class="card-header"
                 {% if item.report.item_needs_purchase_before_leadtime %}
-                style="box-shadow: rgba(255, 0, 0, 0.3) 0 0 0 100px inset;"
+                class="card-header critic-item-card"
+                {% else %}
+                class="card-header"
                 {% endif %}
                 role="tab"
                 id="section{{ forloop.counter }}HeaderId">
@@ -56,10 +57,13 @@
                                 {{ item.report.CPD|floatformat:"0" }}
                             </span>
                         </h5>
-                            <span class="item-title ml-2    ">
+                        <span class="item-title ml-2    ">
                             <h5>{{ item.report.item_partnumber }}</h5>
                         </span>
-                    </a>
+                        <span class="tip">
+                            Item Crítico
+                        </span>
+                    </a>                    
                 </div>
 
                 <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel"
