@@ -57,3 +57,25 @@ a:hover {
 .item-title h5:hover {
     color: rgb(180, 155, 184) !important;
 }
+
+span.tip {
+    display: none;
+}
+
+div.critic-item-card {
+    box-shadow: rgba(255, 0, 0, 0.3) 0 0 0 100px inset;
+}
+
+div.critic-item-card:hover span.tip {
+    cursor: help;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 4px 32px;
+    display: block;
+    position: relative;
+    margin-left: 16px;   
+    z-index: 100;
+}
+
+
