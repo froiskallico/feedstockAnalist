@@ -43,7 +43,7 @@ class NewAnalyzeView(generic.FormView):
                 pra(s) OP(s) {} foi concluída com sucesso e já
                 está disponível.
 
-                Use o link http://192.168.1.117:80/detail/{}
+                Use o link http://app.datateck.com.br/detail/{}
                 para acessá-la diretamente.
                 """.format(
                     str(user.first_name),
@@ -62,7 +62,7 @@ class NewAnalyzeView(generic.FormView):
 
                 Vim aqui só pra te avisar que a tua análise
                 pra(s) OP(s) {} não foi concluída com sucesso.
-                Tente novamente acessando: http://192.168.1.117:80/new
+                Tente novamente acessando: http://app.datateck.com.br/new
 
                 Detalhes do erro: {}
 
