@@ -315,11 +315,7 @@ class App(object):
         # Normliza as datas para formato DateTime
         self.ops_pendentes["ENTREGA"] = pd.to_datetime(self.ops_pendentes["ENTREGA"]) #, dayfirst=True, format='%Y-%m-%d')
 
-        self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna(
-        )]
-
-        self.ops_sem_data_com_semana.to_csv('./extracao.csv')
-        self.ops_pendentes.to_csv("./ops_pendentes.csv")
+        self.ops_sem_data_com_semana = self.ops_pendentes[self.ops_pendentes["ENTREGA"].isna()].dropna(subset=["SEMANA_ENTREGA"])
 
         self.ops_sem_data_com_semana["NSEM"] = self.ops_sem_data_com_semana["SEMANA_ENTREGA"].str.slice(
             0, 2).astype(int)
