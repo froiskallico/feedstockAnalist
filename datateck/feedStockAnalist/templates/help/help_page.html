@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>feedStockAnalist</title>
+        <style>
+</style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+
+    </head>
+    <body class="vscode-light">
+        <h1 id="feedstockanalist">feedStockAnalist</h1>
+<p>Esse aplicativo foi desenvolvido para facilitar a análise de disponibilidade de
+matérias primas de uma ou mais Ordem de Produção.</p>
+<p>Nele você poderá indicar uma ou mais ordens de produção e o sistema irá,
+automaticamente, analisar, para cada matéria prima que compõe cada um dos
+produtos desta(s) OP(s) suas disponibilidades futuras, indicando quais materiais
+podem vir a faltar ao longo do tempo de acordo com as demandas empenhadas, já
+registradas em sistema.</p>
+<h1 id="índice">Índice</h1>
+<ul>
+<li><a href="#feedstockanalist">feedStockAnalist</a></li>
+<li><a href="#%C3%ADndice">Índice</a></li>
+<li><a href="#como-acessar">Como acessar</a></li>
+<li><a href="#logincadastro">Login/Cadastro</a>
+<ul>
+<li><a href="#cadastro">Cadastro</a></li>
+<li><a href="#login">Login</a></li>
+</ul>
+</li>
+<li><a href="#tela-inicial">Tela Inicial</a></li>
+<li><a href="#nova-an%C3%A1lise">Nova Análise</a></li>
+<li><a href="#lista-de-an%C3%A1lises">Lista de Análises</a>
+<ul>
+<li><a href="#relat%C3%B3rio-da-an%C3%A1lise">Relatório da Análise</a>
+<ul>
+<li><a href="#interface-geral">Interface geral</a>
+<ul>
+<li><a href="#resumo-do-relat%C3%B3rio">Resumo do relatório</a>
+<ul>
+<li><a href="#exemplo">Exemplo:</a></li>
+</ul>
+</li>
+<li><a href="#listagem-de-itens">Listagem de Itens</a></li>
+<li><a href="#detalhamento-dos-itens">Detalhamento dos Itens</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#excluindo-uma-an%C3%A1lise">Excluindo uma Análise</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="como-acessar">Como acessar</h1>
+<p>Para acessar o aplicativo use seu navegador favorito para ir até
+<a href="http://app.datateck.com.br/">http://app.datateck.com.br/</a></p>
+<h1 id="logincadastro">Login/Cadastro</h1>
+<h2 id="cadastro">Cadastro</h2>
+<p>Se é a sua primeira vez utilizando o feedStockAnalist, você precisará se
+cadastrar. Para fazer o seu cadastro, na página inicial do aplicativo clique em <strong>Cadastre-se</strong>.</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\cadastre-se.png" alt="http://app.datateck.com.br/login/?next=/"></p>
+<p>Na tela de cadastro você precisa preencher todos os campos do formulário para se cadastrar na plataforma.</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\fomulario_de_cadastro.png" alt=""></p>
+<h2 id="login">Login</h2>
+<p>Caso você já tenha se cadastrado, na tela inicial, basta digitar seus dados de <strong>Usuário</strong> e <strong>Senha</strong>.</p>
+<h1 id="tela-inicial">Tela Inicial</h1>
+<p>Na tela inicial do aplicativo serão exibidas as análises já feitas anteriormente pelo seu usuário.</p>
+<p>Caso você não tenha solicitado nenhuma análise ainda, você verá a tela abaixo, informando que ainda não existem análises.</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\home.png" alt="http://app.datateck.com.br/"></p>
+<p>Para começar uma análise clique em <strong>Nova Análise</strong> no cabeçalho ou no botão verde <strong>Iniciar nova análise</strong>. Ao clicar em um desses links você será redirecionado para a tela de Criação de Nova Análise;</p>
+<h1 id="nova-análise">Nova Análise</h1>
+<p>Na tela abaixo você deverá informar o número de uma ou mais Ordem(ns) de Produção para a(s) qual(is) será feita a análise. <em>Para mais de uma OP, informe seus números separados com vírgulas</em>.</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\nova_analise.png" alt="http://app.datateck.com.br/new/"></p>
+<p>Após informar a(s) OP(s), clique no botão verde <strong>Iniciar nova análise</strong>.</p>
+<ul>
+<li>
+<p>Depois de clicar você pode fechar a página. O sistema irá fazer a análise em segundo plano e, quando estiver tudo pronto, vai lhe <strong>enviar um email</strong> informando que pode acessar a análise (<strong>com um link direto para o relatório da mesma</strong>).</p>
+</li>
+<li>
+<p>O tempo de processamento irá variar, quanto mais matérias primas houverem dentro da(s) OP(s) em análise, maior será o tempo.</p>
+</li>
+<li>
+<p>As análises são criadas e armazenadas no banco de dados com informações (Estoques, OCs, OPs) referentes ao momento em que foram geradas. Ou seja, se você criar uma análise hoje e abrir a mesma daqui 90 dias os dados estarão defasados, mas isso fará com que você possa guardar uma &quot;foto&quot; do estado atual.</p>
+</li>
+<li>
+<p>Você poderá gerar quantas análises quiser de uma mesma OP, sem problemas!</p>
+</li>
+</ul>
+<h1 id="lista-de-análises">Lista de Análises</h1>
+<p>As análises já existentes serão exibidas na tela principal do aplicativo:</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\home2.png" alt="http://app.datateck.com.br/"></p>
+<ul>
+<li>Para abrir o relatório da análise, basta clicar no botão <strong>Abrir</strong></li>
+<li>Se você quiser descartar uma análise, utilize o botão com este símbolo: <img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\lixeira_button.png" alt=""></li>
+</ul>
+<h2 id="relatório-da-análise">Relatório da Análise</h2>
+<p>Os relatórios de análises exibirão uma lista com todas as matérias primas para as quais <strong>houverem sido identificadas possíveis faltas de material</strong>, dentro do horizonte de programação do item (Conforme parâmetros do MRP). <em>Aquelas matérias primas para as quais não foram identificadas iminência de falta não serão exibidas no relatório</em>.</p>
+<h3 id="interface-geral">Interface geral</h3>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\report1.png" alt=""></p>
+<h4 id="resumo-do-relatório">Resumo do relatório</h4>
+<p>Nesta seção é exibido o resumo geral do relatório da análise.</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\report_header.png" alt=""></p>
+<p>Nele constarão:</p>
+<ul>
+<li>O número da(s) Ordem(ns) de Produção;</li>
+<li>A quantidade total itens de matéria prima que foram analisadas;</li>
+<li>A quantidade de itens de matéria prima em que foram identificadas possíveis faltas;</li>
+<li>O custo financeiro total das ações sugeridas. Composto pela somatória dos valores abaixo:
+<ul>
+<li>O valor total das Ordens de Compra sugeridas a serem colocadas para suprir as possíveis faltas;</li>
+<li>O valor total refernte as OPs para as quais o aplicativo sugere alteração;</li>
+</ul>
+</li>
+</ul>
+<h5 id="exemplo">Exemplo:</h5>
+<blockquote>
+<p>O aplicativo sugere a inserção de:</p>
+<ul>
+<li>Uma OC no valor total de R$ 500,00;</li>
+<li>Outra OC no valor total de R$ 250,00.</li>
+</ul>
+<p>Além disso, o aplicativo também verifica que para outro produto já existe uma OC pendente para a qual apenas é necessária uma antecipação.</p>
+<ul>
+<li>Essa alteração de data corresponde a uma movimentação financeira equivalente a R$ 175,00.</li>
+</ul>
+<p>Dessa forma:</p>
+<p>|      VALOR      |         Descrição          |
+| :-: | :: |
+|   + R$ 500,00   |            OC 1            |
+|   + R$ 250,00   |            OC 2            |
+|   + R$ 175,00   |        Antecipação         |
+| <strong>= R$ 925,00</strong> | <strong>Custo Financeiro total</strong> |</p>
+</blockquote>
+<h4 id="listagem-de-itens">Listagem de Itens</h4>
+<p>Nesta seção serão listados todos os itens para os quais foram identificadas possíveis faltas:</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\report_items.png" alt=""></p>
+<p>Cada linha da listagem corresponde a um item com falta iminente. Na linha, é exibido o <strong>CPD</strong> do item e seu <strong>Código do Fabricante</strong>.</p>
+<ul>
+<li>
+<p>As linhas exibidas em cor <strong>vermelha</strong> correspondem a itens <strong>críticos</strong>. Ao passar o mouse sobre eles será exibido um alerta;</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\critical_item_alert.png" alt=""></p>
+<p><em><strong>Item Crítico</strong> = Item com data de necessidade de aquisição inferior ao LeadTime do Fornecedor</em>;</p>
+</li>
+<li>
+<p>As demais linhas são items com falta mas não críticos;</p>
+</li>
+</ul>
+<h4 id="detalhamento-dos-itens">Detalhamento dos Itens</h4>
+<p>Ao clicar nos itens, serão expandidos seus relatórios de detalhamento individual.</p>
+<p>O layout dos relatórios segue o mesmo padrão:</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\item_detail_legenda.gif" alt=""></p>
+<ul>
+<li>
+<p><strong>Dados do item</strong>: CPD e Código do fabricante;</p>
+</li>
+<li>
+<p><strong>Quantidade faltante</strong>: Somatório das quantidades comprometidas em OPs que não serão atendidas por falta de material;</p>
+</li>
+<li>
+<p><strong>Ação sugerida</strong>: Comprar e/ou Antecipar OC - Caso hajam OCs postas no sistema, que possam ser antecipadas, o sistema sugerirá a <strong>Antecipação</strong>. Caso hajam OCs mas não sejam suficientes para suprir o total faltante, o sistema sugerirá <strong>Antecipar/Comprar</strong>. Caso não existam OCs pendentes, a sugestão será apenas a <strong>Compra</strong>;</p>
+<p>Quando a cor de fundo da ação sugerida <strong>Comprar</strong> for <em>Vermelha</em>, como na imagem abaixo, significa que a quantidade sugerida a ser comprada excede o Estoque Máximo.</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\red_suggested_action.png" alt=""></p>
+</li>
+<li>
+<p><strong>Custo das ações</strong>: Somatório do custo financeiro das ações sugeridas, seguindo a mesma lógica <a href="#exemplo">deste exemplo acima</a>. Neste caso, o sistema exibirá os valores referentes a Antecipações e Compras <strong>separadamente</strong>, exemplo:</p>
+<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\double_actions.png" alt=""></p>
+</li>
+<li>
+<p><strong>Navegação</strong>: Esta é a seção onde pode-se navegar pelos demais detalhes da análise:</p>
+<ul>
+<li>
+<p><strong>Timeline</strong>: Linha do tempo, similar ao MRP, exibindo Datas, Saldos Iniciais, Quantidades Pendentes em OCs, Total Comprometido (OPs pendentes) e os Saldos finais;</p>
+</li>
+<li>
+<p><strong>OPs Faltantes</strong>: Lista as Ordens de Produção para as quais o sistema identificou que faltarão a matéria prima em questão;</p>
+</li>
+<li>
+<p><strong>Ordemns de Compra Pendentes</strong>: Lista as Ordens de Compra pendentes, quando houverem;</p>
+</li>
+<li>
+<p><strong>OCs para Antecipar</strong>: Lista as OCs que foram identificadas como &quot;Antecipáveis&quot; para suprir a falta de material;</p>
+</li>
+<li>
+<p><strong>Comprar</strong>: Informa ao usuário:</p>
+<ul>
+<li>A quantidade sugerida a ser comprada;</li>
+<li>A data em que o sistema identificou em que haverá a primeira falta;</li>
+<li>O custo total da quantidade a ser comprada;</li>
+<li>O MOQ do item;</li>
+</ul>
+<p><em>Quando o sistema identificar que é necessária uma compra que exceda o Estoque Máximo, também serão exibidos:</em></p>
+</li>
+<li>
+<p><strong>Estoque máximo</strong>: A quantidade calculada para Estoque Máximo (Conforme parâmetros do MRP);</p>
+<p><em>O sistema calcula a quantidade a ser comprada respeitando o Estoque Máximo, conforme parâmetros do MRP</em></p>
+</li>
+<li>
+<p><strong>Quantidade excedente</strong>: A quantidade a ser comprada que excede o Estoque Máximo;</p>
+</li>
+<li>
+<p><strong>Valor da quantidade excedente</strong>: O valor financeiro relativo à quantidade a ser comprada que excede o Estoque Máximo.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="excluindo-uma-análise">Excluindo uma Análise</h2>
+<p><span style="color: #ff1f1ff1;"><strong>Atenção: Uma exclusão de análise não pode ser desfeita!</strong></span></p>
+<p>Ao clicar no botão de exclusão de uma análise você será redirecionado para uma página de confirmação. Por favor, somente confirme se você realmente deseja excluir essa análise para sempre pois, uma vez excluída, ela <strong>não poderá ser recuperada</strong> de nenhuma forma!</p>
+
+    </body>
+    </html>
