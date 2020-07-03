@@ -13,5 +13,5 @@ class RegisterView(generic.FormView):
         return super(RegisterView, self).form_valid(form)
 
 class HelpView(generic.TemplateView):
-    template_name = "help_page.html"
+    template_name = "help/help_page.html"
 
