@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
     <html>
     <head>
@@ -73,19 +75,19 @@ registradas em sistema.</p>
 <h2 id="cadastro">Cadastro</h2>
 <p>Se é a sua primeira vez utilizando o feedStockAnalist, você precisará se
 cadastrar. Para fazer o seu cadastro, na página inicial do aplicativo clique em <strong>Cadastre-se</strong>.</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\cadastre-se.png" alt="http://app.datateck.com.br/login/?next=/"></p>
+<p><img src="{% static "images/help/cadastre-se.png" %}" alt="http://app.datateck.com.br/login/?next=/"></p>
 <p>Na tela de cadastro você precisa preencher todos os campos do formulário para se cadastrar na plataforma.</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\fomulario_de_cadastro.png" alt=""></p>
+<p><img src="{% static "images/help/fomulario_de_cadastro.png" %}" alt=""></p>
 <h2 id="login">Login</h2>
 <p>Caso você já tenha se cadastrado, na tela inicial, basta digitar seus dados de <strong>Usuário</strong> e <strong>Senha</strong>.</p>
 <h1 id="tela-inicial">Tela Inicial</h1>
 <p>Na tela inicial do aplicativo serão exibidas as análises já feitas anteriormente pelo seu usuário.</p>
 <p>Caso você não tenha solicitado nenhuma análise ainda, você verá a tela abaixo, informando que ainda não existem análises.</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\home.png" alt="http://app.datateck.com.br/"></p>
+<p><img src="{% static "images/help/home.png" %}" alt="http://app.datateck.com.br/"></p>
 <p>Para começar uma análise clique em <strong>Nova Análise</strong> no cabeçalho ou no botão verde <strong>Iniciar nova análise</strong>. Ao clicar em um desses links você será redirecionado para a tela de Criação de Nova Análise;</p>
 <h1 id="nova-análise">Nova Análise</h1>
 <p>Na tela abaixo você deverá informar o número de uma ou mais Ordem(ns) de Produção para a(s) qual(is) será feita a análise. <em>Para mais de uma OP, informe seus números separados com vírgulas</em>.</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\nova_analise.png" alt="http://app.datateck.com.br/new/"></p>
+<p><img src="{% static "images/help/nova_analise.png" %}" alt="http://app.datateck.com.br/new/"></p>
 <p>Após informar a(s) OP(s), clique no botão verde <strong>Iniciar nova análise</strong>.</p>
 <ul>
 <li>
@@ -103,18 +105,18 @@ cadastrar. Para fazer o seu cadastro, na página inicial do aplicativo clique em
 </ul>
 <h1 id="lista-de-análises">Lista de Análises</h1>
 <p>As análises já existentes serão exibidas na tela principal do aplicativo:</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\home2.png" alt="http://app.datateck.com.br/"></p>
+<p><img src="{% static "images/help/home2.png" %}" alt="http://app.datateck.com.br/"></p>
 <ul>
 <li>Para abrir o relatório da análise, basta clicar no botão <strong>Abrir</strong></li>
-<li>Se você quiser descartar uma análise, utilize o botão com este símbolo: <img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\lixeira_button.png" alt=""></li>
+<li>Se você quiser descartar uma análise, utilize o botão com este símbolo: <img src="{% static "images/help/lixeira_button.png" %}" alt=""></li>
 </ul>
 <h2 id="relatório-da-análise">Relatório da Análise</h2>
 <p>Os relatórios de análises exibirão uma lista com todas as matérias primas para as quais <strong>houverem sido identificadas possíveis faltas de material</strong>, dentro do horizonte de programação do item (Conforme parâmetros do MRP). <em>Aquelas matérias primas para as quais não foram identificadas iminência de falta não serão exibidas no relatório</em>.</p>
 <h3 id="interface-geral">Interface geral</h3>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\report1.png" alt=""></p>
+<p><img src="{% static "images/help/report1.png" %}" alt=""></p>
 <h4 id="resumo-do-relatório">Resumo do relatório</h4>
 <p>Nesta seção é exibido o resumo geral do relatório da análise.</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\report_header.png" alt=""></p>
+<p><img src="{% static "images/help/report_header.png" %}" alt=""></p>
 <p>Nele constarão:</p>
 <ul>
 <li>O número da(s) Ordem(ns) de Produção;</li>
@@ -148,12 +150,12 @@ cadastrar. Para fazer o seu cadastro, na página inicial do aplicativo clique em
 </blockquote>
 <h4 id="listagem-de-itens">Listagem de Itens</h4>
 <p>Nesta seção serão listados todos os itens para os quais foram identificadas possíveis faltas:</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\report_items.png" alt=""></p>
+<p><img src="{% static "images/help/report_items.png" %}" alt=""></p>
 <p>Cada linha da listagem corresponde a um item com falta iminente. Na linha, é exibido o <strong>CPD</strong> do item e seu <strong>Código do Fabricante</strong>.</p>
 <ul>
 <li>
 <p>As linhas exibidas em cor <strong>vermelha</strong> correspondem a itens <strong>críticos</strong>. Ao passar o mouse sobre eles será exibido um alerta;</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\critical_item_alert.png" alt=""></p>
+<p><img src="{% static "images/help/critical_item_alert.png" %}" alt=""></p>
 <p><em><strong>Item Crítico</strong> = Item com data de necessidade de aquisição inferior ao LeadTime do Fornecedor</em>;</p>
 </li>
 <li>
@@ -163,7 +165,7 @@ cadastrar. Para fazer o seu cadastro, na página inicial do aplicativo clique em
 <h4 id="detalhamento-dos-itens">Detalhamento dos Itens</h4>
 <p>Ao clicar nos itens, serão expandidos seus relatórios de detalhamento individual.</p>
 <p>O layout dos relatórios segue o mesmo padrão:</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\item_detail_legenda.gif" alt=""></p>
+<p><img src="{% static "images/help/item_detail_legenda.gif" alt=""></p>
 <ul>
 <li>
 <p><strong>Dados do item</strong>: CPD e Código do fabricante;</p>
@@ -174,11 +176,11 @@ cadastrar. Para fazer o seu cadastro, na página inicial do aplicativo clique em
 <li>
 <p><strong>Ação sugerida</strong>: Comprar e/ou Antecipar OC - Caso hajam OCs postas no sistema, que possam ser antecipadas, o sistema sugerirá a <strong>Antecipação</strong>. Caso hajam OCs mas não sejam suficientes para suprir o total faltante, o sistema sugerirá <strong>Antecipar/Comprar</strong>. Caso não existam OCs pendentes, a sugestão será apenas a <strong>Compra</strong>;</p>
 <p>Quando a cor de fundo da ação sugerida <strong>Comprar</strong> for <em>Vermelha</em>, como na imagem abaixo, significa que a quantidade sugerida a ser comprada excede o Estoque Máximo.</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\red_suggested_action.png" alt=""></p>
+<p><img src="{% static "images/help/red_suggested_action.png" %}" alt=""></p>
 </li>
 <li>
 <p><strong>Custo das ações</strong>: Somatório do custo financeiro das ações sugeridas, seguindo a mesma lógica <a href="#exemplo">deste exemplo acima</a>. Neste caso, o sistema exibirá os valores referentes a Antecipações e Compras <strong>separadamente</strong>, exemplo:</p>
-<p><img src="file:///c:\Users\Kallico\Desktop\Apres. FSA\screenshots\double_actions.png" alt=""></p>
+<p><img src="{% static "images/help/double_actions.png" %}" alt=""></p>
 </li>
 <li>
 <p><strong>Navegação</strong>: Esta é a seção onde pode-se navegar pelos demais detalhes da análise:</p>
