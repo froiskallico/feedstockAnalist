@@ -1,4 +1,4 @@
-# %%
+ # %%
 from pprint import pprint
 import numpy as np
 import pandas as pd
@@ -161,14 +161,14 @@ class App(object):
                         MP.DELAY_OC LEADTIME
 
                     FROM
-                        FIC_TEC FIC
-                        JOIN PRODUTOS MP ON MP.PK_PRO = FIC.FK_PRO
-                        JOIN RADAR_ITENS_CRITICOS RIC ON RIC.FK_PRO = FIC.FK_PROACAB
+                        
+                        RADAR_ITENS_CRITICOS RAD
+                        JOIN PRODUTOS MP ON MP.PK_PRO = RAD.FK_PRO
                         LEFT JOIN MOEDAS MOE ON MOE.PK_MOE = MP.FK_MOE
                         LEFT JOIN NIVEL_SERVICO NIV ON NIV.PK_NIV = MP.FK_NIV
 
                     WHERE
-                        RIC.DATA_CONCLUSAO IS NULL
+                        RAD.DATA_CONCLUSAO IS NULL
                 """
             else:
                 query = """
@@ -210,6 +210,7 @@ class App(object):
 
         self.feedstock_to_analyze = fetch_data_from_csv(
         ) if self.read_from_csv else fetch_data_from_database()
+
 
         def normalize_fields(dict_of_data_to_normalize):
             for key, value in dict_of_data_to_normalize.items():
@@ -286,16 +287,15 @@ class App(object):
                         (IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0)) * IPC.VALOR VALOR_TOTAL
 
                     FROM
-                        ITE_PCO IPC
+                        RADAR_ITENS_CRITICOS RAD
+                        JOIN ITE_PCO IPC ON IPC.FK_PRO = RAD.FK_PRO
                         JOIN PEDCOMPR PCO ON PCO.pk_pco = IPC.FK_PCO
                         JOIN CADASTRO CAD ON CAD.PK_CAD = PCO.FK_CAD
                         JOIN MOEDAS MOE ON MOE.PK_MOE = IPC.FK_MOE
-                        JOIN FIC_TEC FIC ON FIC.FK_PRO = IPC.FK_PRO
-                        JOIN RADAR_ITENS_CRITICOS RIC ON RIC.FK_PRO = FIC.FK_PROACAB
 
                     WHERE
                         IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0) > 0 AND
-                        RIC.DATA_CONSLUSAO IS NULL
+                        RAD.DATA_CONCLUSAO IS NULL
                 """
             else:
                 query = """
@@ -320,10 +320,8 @@ class App(object):
                         IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0) > 0 AND
                         ISE.FK_OSE IN ({})
                 """.format(self.production_orders_to_analyze_list)
-            return pd.read_sql(
-                query,
-                self.db.connection
-            )
+
+            return pd.read_sql(query, self.db.connection)
 
         def fetch_data_from_csv():
             return pd.read_csv(self.path_csv + 'ocs_pendentes.csv')
@@ -351,9 +349,8 @@ class App(object):
                         (ISE_GERAL.QUANTIDADE - COALESCE(ISE_GERAL.QTD_CANC, 0) - COALESCE(ISE_GERAL.QTD_PROD, 0)) * FIC_GERAL.QUANTIDADE COMPROMETIDO
 
                     FROM
-                        FIC_TEC FIC_OP
-                        JOIN FIC_TEC FIC_GERAL ON FIC_GERAL.FK_PRO = FIC_OP.FK_PRO
-                        JOIN RADAR_ITENS_CRITICOS RIC ON RIC.FK_PRO = FIC_OP.FK_PROACAB
+                        RADAR_ITENS_CRITICOS RAD
+                        JOIN FIC_TEC FIC_GERAL ON FIC_GERAL.FK_PRO = RAD.FK_PRO
                         JOIN ITE_OSE ISE_GERAL ON ISE_GERAL.FK_PRO = FIC_GERAL.FK_PROACAB
                         JOIN ITE_PED IPE ON IPE.PK_IPE = ISE_GERAL.FK_IPE
                         JOIN PRODUTOS CHICOTE ON CHICOTE.PK_PRO = FIC_GERAL.FK_PROACAB
@@ -362,7 +359,7 @@ class App(object):
 
                     WHERE
                         ISE_GERAL.QUANTIDADE - COALESCE(ISE_GERAL.QTD_CANC, 0) - COALESCE(ISE_GERAL.QTD_PROD, 0) > 0 AND
-                        RIC.DATA_CONCLUSAO IS NULL
+                        RAD.DATA_CONCLUSAO IS NULL
                 """
             else:
                 query = """
