@@ -14,7 +14,7 @@ import os
 import json
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 if DEBUG:
     config_file_path = './config.json'
@@ -33,7 +33,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config['SECRET_KEY']
 
-ALLOWED_HOSTS = ['0.0.0.0', '45.234.187.209', 'app.datateck.com.br', 'localhost', '192.168.0.240']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '45.234.187.209', 'app.datateck.com.br', 'localhost', '192.168.0.240']
 
 
 # Application definition
