@@ -113,7 +113,6 @@ class NewRadarItemsAnalyzeView(generic.TemplateView):
     success_url = reverse_lazy('feedStockAnalist:index')
 
     def get(self, request):
-        print("oi, mundo")
         self.new_analyze = Analysis(created_at=timezone.now(), created_by=self.request.user)
 
         try:
