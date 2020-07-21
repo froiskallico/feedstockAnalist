@@ -71,7 +71,7 @@ class NewAnalyzeView(generic.FormView):
                     str(e)
                 ),
             from_email="tri.inovacao@gmail.com",
-            recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com']
+            recipient_list=['kallico@datateck.com.br', 'froiskallico@gmail.com', user.email]
             )
 
         return super(NewAnalyzeView, self).form_valid(form)
