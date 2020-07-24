@@ -161,7 +161,7 @@ class App(object):
                         MP.DELAY_OC LEADTIME
 
                     FROM
-                        
+
                         RADAR_ITENS_CRITICOS RAD
                         JOIN PRODUTOS MP ON MP.PK_PRO = RAD.FK_PRO
                         LEFT JOIN MOEDAS MOE ON MOE.PK_MOE = MP.FK_MOE
@@ -511,7 +511,7 @@ class App(object):
 
         def flag_dates_with_missing():
             # Cria a coluna que indica SE e QUANDO ira faltar MP na self.tl
-            self.tl["FALTA"] = self.tl["SALDO_FINAL"] <= 0
+            self.tl["FALTA"] = self.tl["SALDO_FINAL"] <= 0.01
 
         def count_dates_with_lack():
             # Checa se haverá falta em alguma data na TL
