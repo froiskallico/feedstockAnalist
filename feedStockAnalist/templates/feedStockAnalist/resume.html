@@ -1,0 +1,79 @@
+{% extends 'feedStockAnalist/base.html' %} {% block content %}
+
+<div class="container rounded half-opacity text-light p-3">
+    <header class="row p-3 w-100">
+        <div class="col-sm-9">
+            <h2>Resumo da análise</h2>
+
+            <h5>
+                Você pode copiar e colar a tabela abaixo e colar a mesma na sua planilha
+                eletrônica preferida
+            </h5>
+        </div>
+
+        <div class="col-sm-3">
+            <button type="button" class="btn btn-primary float-right p-2" onclick="copyTable()">
+                Copiar tabela
+            </button>
+        </div>
+    </header>
+
+    <section>
+
+        <div class="card m-3 half-opacity rounded">
+
+            <div class="table-responsive table-sm rounded">
+                <table class="table rounded table-light text-dark table-hover" id="resume-table">
+                    <thead>
+                        <tr>
+                            <th>OP</th>
+                            <th>Criado por</th>
+                            <th>Data da Análise</th>
+                            <th>Quantidade de Itens</th>
+                            <th>Itens com falta</th>
+                            <th>Custo das Ações</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class='text-dark rounded'>
+                        <tr>
+                            <td scope="row">1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                            <td>5</td>
+                            <td>6</td>
+                            <td>7</td>
+                        </tr>
+                        <tr>
+                            <td scope="row">1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                            <td>5</td>
+                            <td>6</td>
+                            <td>7</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+
+    </section>
+</div>
+
+<script>
+    function copyTable() {
+        window.getSelection().removeAllRanges()
+
+        var urlField = document.getElementById('resume-table')
+        var range = document.createRange()
+        range.selectNode(urlField)
+        window.getSelection().addRange(range)
+        document.execCommand('copy')
+    }
+
+</script>
+{% endblock %}
