@@ -191,6 +191,25 @@ class NewRadarItemsAnalyzeView(generic.TemplateView):
         return self.new_analyze.id
 
 
+class ResumeView(generic.ListView):
+    template_name = 'feedStockAnalist/resume.html'
+    context_object_name = 'resume'
+
+    def get_queryset(self):
+        queryset = MissingItems.objects.filter(analysis__id = self.kwargs["pk"])
+        return queryset
+
+    def get_context_data(self):
+        context = super().get_context_data()
+
+        pk = self.kwargs["pk"]
+
+        analysis = Analysis.objects.get(pk=pk)
+        context["synthesis"] = analysis.synthesis
+
+        return context
+
+
 class DetailView(generic.ListView):
     template_name = 'feedStockAnalist/detail.html'
     context_object_name = 'report'
