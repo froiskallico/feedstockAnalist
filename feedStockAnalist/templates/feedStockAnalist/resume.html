@@ -1,7 +1,9 @@
 {% extends 'feedStockAnalist/base.html' %} {% block content %}
 
 <div class="container rounded half-opacity text-light p-3">
-    <header class="row p-3 w-100">
+    {% if report %}
+
+    <header class="row p-1 w-100">
         <div class="col-sm-9">
             <h2>Resumo da análise</h2>
 
@@ -19,49 +21,78 @@
     </header>
 
     <section>
-
-        <div class="card m-3 half-opacity rounded">
-
-            <div class="table-responsive table-sm rounded">
+        <div class="card m-1 half-opacity rounded">
+            <div class="table-responsive table-xl rounded">
                 <table class="table rounded table-light text-dark table-hover" id="resume-table">
                     <thead>
                         <tr>
-                            <th>OP</th>
-                            <th>Criado por</th>
-                            <th>Data da Análise</th>
-                            <th>Quantidade de Itens</th>
-                            <th>Itens com falta</th>
-                            <th>Custo das Ações</th>
-                            <th>Ações</th>
+                            <th>OP{% if ',' in synthesis.production_orders_to_analyze_list %}S{% endif %}:</th>
+                            <th>{{ synthesis.production_orders_to_analyze_list }}</th>
+                        </tr>
+                        <tr>
+                            <th>Itens Analisados:</th>
+                            <th>{{ synthesis.feedstock_items_count }}</th>
+                        </tr>
+                        <tr>
+                            <th>Itens com falta iminente:</th>
+                            <th>{{ synthesis.missing_feedstock_items_count }}</th>
+                        </tr>
+                        <tr>
+                            <th>Custo total das ações sugeridas (R$):</th>
+                            <th>{{ synthesis.total_cost_of_actions|floatformat:2 }}</th>
+                        </tr>
+                        <tr>
+                            <th>CPD</th>
+                            <th>Código Fabricante</th>
+                            <th>Item Crítico?</th>
+                            <th>Data da primeira falta</th>
+                            <th>Quantidade que faltará (pçs)</th>
+                            <th>Ação sugerida</th>
+                            <th>Moeda</th>
+                            <th>Custo das Antecipações</th>
+                            <th>Custo das Compras</th>
+                            <th>OCs para Antecipar</th>
+                            <th>Quantidade a Comprar (pçs)</th>
+                            <th>MOQ do item</th>
+                            <th>Compra Excede Estoque Máximo</th>
+                            <th>Estoque Máximo</th>
+                            <th>Quantidade Excedente</th>
+                            <th>Valor da Quantidade Excedente</th>
                         </tr>
                     </thead>
                     <tbody class='text-dark rounded'>
-                        <tr>
-                            <td scope="row">1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                            <td>5</td>
-                            <td>6</td>
-                            <td>7</td>
+                        {% for item in report %}
+                        <tr {% if item.report.item_needs_purchase_before_leadtime %} style="background-color: #ff8e8e;"
+                            {% endif %}>
+                            <td>{{ item.report.CPD|floatformat:"0" }}</td>
+                            <td>{{ item.report.item_partnumber }}</td>
+                            <td>{% if item.report.item_needs_purchase_before_leadtime %}Sim{% endif %}</td>
+                            <td>{{ item.report.first_lack_date|date }}</td>
+                            <td>{{ item.report.quantidade_falta|floatformat:"0" }}</td>
+                            <td>{{ item.report.acao_sugerida }}</td>
+                            <td>{{ item.report.moeda }}</td>
+                            <td>{{ item.report.custo_acao_antecipar|floatformat:2 }}</td>
+                            <td>{{ item.report.custo_acao_comprar|floatformat:2 }}</td>
+                            <td>{% for oc in item.report.ocs_para_antecipar %}{{ oc.OC|floatformat:"0" }}, {% endfor %}</td>
+                            <td>{{ item.report.quantidade_comprar|floatformat:"0" }}</td>
+                            <td>{{ item.report.item_moq|floatformat:"0" }}</td>
+                            <td>{% if item.report.purchase_quantity_exceeds_max_stock_alert %}Sim{% endif %}</td>
+                            <td>{{ item.report.max_stock|floatformat:"0" }}</td>
+                            <td>{{ item.report.how_much_purchasing_exceeds_max_stock|floatformat:"0" }}</td>
+                            <td>{{ item.report.how_much_costs_the_purchasing_that_exceeds_max_stock|floatformat:"2" }}
+
                         </tr>
-                        <tr>
-                            <td scope="row">1</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>4</td>
-                            <td>5</td>
-                            <td>6</td>
-                            <td>7</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
+
                 </table>
             </div>
-
         </div>
-
-
     </section>
+
+    {% else %}
+    <p>Não foi encontrada nenhuma falta!</p>
+    {% endif %}
 </div>
 
 <script>
@@ -76,4 +107,5 @@
     }
 
 </script>
+
 {% endblock %}
