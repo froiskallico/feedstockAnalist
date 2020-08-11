@@ -4,8 +4,17 @@
 <div class="jumbotron jumbotron-fluid col-12 half-opacity text-light p-3 rounded">
     <header>
         <div class="container-fluid">
-            <h1 class="display-4">OP{% if ',' in synthesis.production_orders_to_analyze_list %}S{% endif %}:
-                {{ synthesis.production_orders_to_analyze_list }}</h1>
+            <div class="row">
+                <h1 class="display-4 col-sm-10">
+                    OP{% if ',' in synthesis.production_orders_to_analyze_list %}S{% endif %}:
+                    {{ synthesis.production_orders_to_analyze_list }}
+                </h1>
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-primary p-2">
+                        Resumo
+                    </button>
+                </div>
+            </div>
             <p class="lead">Resumo da análise:</p>
             <div class="row rounded bg-light text-center text-dark">
                 <div class="col-sm">
@@ -26,6 +35,7 @@
         <hr class="hr-light" />
     </header>
 
+
     <section>
         {% if report %}
 
@@ -33,23 +43,12 @@
         <div id="reportAccordian" role="tablist" aria-multiselectable="true">
             {% for item in report %}
             <div class="card half-opacity text-light mb-1">
-                <div
-                {% if item.report.item_needs_purchase_before_leadtime %}
-                class="card-header critic-item-card"
-                {% else %}
-                class="card-header"
-                {% endif %}
-                role="tab"
-                id="section{{ forloop.counter }}HeaderId">
-                    <a
-                        class="text-light row"
-                        data-toggle="collapse"
-                        data-parent="#reportAccordian"
-                        href="#section{{ forloop.counter }}ContentId"
-                        aria-expanded="false"
+                <div {% if item.report.item_needs_purchase_before_leadtime %} class="card-header critic-item-card"
+                    {% else %} class="card-header" {% endif %} role="tab" id="section{{ forloop.counter }}HeaderId">
+                    <a class="text-light row" data-toggle="collapse" data-parent="#reportAccordian"
+                        href="#section{{ forloop.counter }}ContentId" aria-expanded="false"
                         aria-controls="section{{ forloop.counter }}ContentId"
-                        onclick="toggleChevron({{ forloop.counter }})"
-                    >
+                        onclick="toggleChevron({{ forloop.counter }})">
                         <h5>
                             <i class="fas fa-chevron-down fa-fw mx-2" id="chevron-{{ forloop.counter }}">
                             </i>
@@ -63,7 +62,7 @@
                         <span class="tip">
                             Item Crítico
                         </span>
-                    </a>                    
+                    </a>
                 </div>
 
                 <div id="section{{ forloop.counter }}ContentId" class="collapse in" role="tabpanel"
@@ -75,20 +74,23 @@
                                 <p class="my-auto font-weight-bold">Quantidade que faltará</p>
                                 <p class="my-auto">{{ item.report.quantidade_falta|floatformat:"0" }} pçs</p>
                             </div>
-                            <div class="col-sm rounded mx-1" style="background-color: {% if item.report.purchase_quantity_exceeds_max_stock_alert %}#900{% else %}#333{% endif %};">
+                            <div class="col-sm rounded mx-1"
+                                style="background-color: {% if item.report.purchase_quantity_exceeds_max_stock_alert %}#900{% else %}#333{% endif %};">
                                 <p class="my-auto font-weight-bold">Ação sugerida</p>
                                 <p class="my-auto">{{ item.report.acao_sugerida }}</p>
                             </div>
                             {% if item.report.custo_acao_antecipar > 0 %}
                             <div class="col-sm rounded mx-1" style="background-color: #444;">
                                 <p class="my-auto font-weight-bold">Custo das Antecipações</p>
-                                <p class="my-auto">{{ item.report.moeda }} {{ item.report.custo_acao_antecipar|floatformat:2  }}</p>
+                                <p class="my-auto">{{ item.report.moeda }}
+                                    {{ item.report.custo_acao_antecipar|floatformat:2  }}</p>
                             </div>
                             {% endif %}
                             {% if item.report.custo_acao_comprar > 0 %}
                             <div class="col-sm rounded mx-1" style="background-color: #444;">
                                 <p class="my-auto font-weight-bold">Custo das Compras</p>
-                                <p class="my-auto">{{ item.report.moeda }} {{ item.report.custo_acao_comprar|floatformat:2  }}</p>
+                                <p class="my-auto">{{ item.report.moeda }}
+                                    {{ item.report.custo_acao_comprar|floatformat:2  }}</p>
                             </div>
                             {% endif %}
                         </div>
@@ -108,7 +110,8 @@
                                 <a class="nav-link" id="v-pills-pending-purchase-orders{{ forloop.counter }}-tab"
                                     data-toggle="pill" href="#v-pills-pending-purchase-orders{{ forloop.counter }}"
                                     role="tab" aria-controls="v-pills-pending-purchase-orders{{ forloop.counter }}"
-                                    aria-selected="false">Orde{{ item.report.ocs_futuras|length|pluralize:"m,ns" }} de Compra
+                                    aria-selected="false">Orde{{ item.report.ocs_futuras|length|pluralize:"m,ns" }} de
+                                    Compra
                                     Pendente{{ item.report.ocs_futuras|length|pluralize }}</a>
                                 {% endif %}
                                 {% if item.report.ocs_para_antecipar %}
@@ -144,7 +147,8 @@
                                             </thead>
                                             <tbody>
                                                 {% for line in item.report.timeline %}
-                                                <tr {% if line.FALTA %}style="box-shadow: rgba(255, 0, 0, 0.40) 0 0 0 100px inset;"{% endif %}>
+                                                <tr {% if line.FALTA %}style="box-shadow: rgba(255, 0, 0, 0.40) 0 0 0 100px inset;"
+                                                    {% endif %}>
                                                     <td scope="row">{{ line.ENTREGA|date:"SHORT_DATE_FORMAT" }}</td>
                                                     <td>{{ line.SALDO_INICIAL|floatformat:"0" }}</td>
                                                     <td>{{ line.QTD_PENDENTE_OC|floatformat:"0" }}</td>
@@ -253,22 +257,31 @@
                                 <div class="tab-pane fade" id="v-pills-purchase-action{{ forloop.counter }}"
                                     role="tabpanel" aria-labelledby="v-pills-purchase-action{{ forloop.counter }}">
                                     <h3>Comprar:</h3>
-                                    <h5>Quantidade a comprar: {{ item.report.quantidade_comprar|floatformat:"0" }} pçs</h5>
+                                    <h5>Quantidade a comprar: {{ item.report.quantidade_comprar|floatformat:"0" }} pçs
+                                    </h5>
                                     <h5>Data da primeira falta: {{ item.report.first_lack_date|date }}</h5>
-                                    <h5>Custo da ação comprar: {{ item.report.moeda }} {{ item.report.custo_acao_comprar|floatformat:2 }}</h5>
+                                    <h5>Custo da ação comprar: {{ item.report.moeda }}
+                                        {{ item.report.custo_acao_comprar|floatformat:2 }}</h5>
                                     <h5>MOQ do item: {{ item.report.item_moq|floatformat:"0" }}</h5>
 
                                     {% if item.report.purchase_quantity_exceeds_max_stock_alert %}
                                     <br>
-                                    <h5>Estoque máximo: {{ item.report.max_stock|floatformat:"0" }}    </h5>
-                                    <h5>Quantidade Excedente: {{ item.report.how_much_purchasing_exceeds_max_stock|floatformat:"0" }} pçs</h5>
-                                    <h5>Valor da Quantidade Excedente: {{ item.report.moeda }} {{ item.report.how_much_costs_the_purchasing_that_exceeds_max_stock|floatformat:"2" }}</h5>
+                                    <h5>Estoque máximo: {{ item.report.max_stock|floatformat:"0" }} </h5>
+                                    <h5>Quantidade Excedente:
+                                        {{ item.report.how_much_purchasing_exceeds_max_stock|floatformat:"0" }} pçs</h5>
+                                    <h5>Valor da Quantidade Excedente: {{ item.report.moeda }}
+                                        {{ item.report.how_much_costs_the_purchasing_that_exceeds_max_stock|floatformat:"2" }}
+                                    </h5>
                                     {% endif %}
 
                                     {% if item.report.purchase_quantity_exceeds_moq_alert %}
                                     <br>
-                                    <h5>Quantidade Excedente: {{ item.report.how_much_purchasing_exceeds_missing_quantity|floatformat:"0" }} pçs</h5>
-                                    <h5>Valor da Quantidade Excedente: {{ item.report.moeda }} {{ item.report.how_much_costs_the_purchasing_that_exceeds_missing_quantity }}</h5>
+                                    <h5>Quantidade Excedente:
+                                        {{ item.report.how_much_purchasing_exceeds_missing_quantity|floatformat:"0" }}
+                                        pçs</h5>
+                                    <h5>Valor da Quantidade Excedente: {{ item.report.moeda }}
+                                        {{ item.report.how_much_costs_the_purchasing_that_exceeds_missing_quantity }}
+                                    </h5>
                                     {% endif %}
 
                                 </div>
@@ -295,27 +308,31 @@
 
     <footer class="mt-4">
         <nav aria-label="Page navigation">
-          <ul class="pagination justify-content-center">
-            <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
-              <a class="page-link " href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-                <span class="sr-only">Anterior</span>
-              </a>
-            </li>
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                    <a class="page-link "
+                        href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}"
+                        aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Anterior</span>
+                    </a>
+                </li>
 
-            <li class="page-item disabled">
-            <div class="page-link">
-            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-            </div>
-            </li>
+                <li class="page-item disabled">
+                    <div class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </div>
+                </li>
 
-            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
-              <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="sr-only">Próxima</span>
-              </a>
-            </li>
-          </ul>
+                <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                    <a class="page-link"
+                        href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Próxima</span>
+                    </a>
+                </li>
+            </ul>
         </nav>
     </footer>
 </div>
@@ -323,10 +340,11 @@
 
 <script>
     function toggleChevron(id) {
-        icon_class_list = document.getElementById("chevron-"+id).classList;
+        icon_class_list = document.getElementById("chevron-" + id).classList;
 
         icon_class_list.toggle("fa-chevron-down");
         icon_class_list.toggle("fa-chevron-up");
     }
+
 </script>
 {% endblock %}
