@@ -225,6 +225,7 @@ class DetailView(generic.ListView):
         pk = self.kwargs["pk"]
 
         analysis = Analysis.objects.get(pk=pk)
+        context["analyze_id"] = analysis.pk
         context["synthesis"] = analysis.synthesis
 
         return context
