@@ -145,3 +145,4 @@ cython_debug/
 
 # csv exports
 *.csv
+*.debug.py
