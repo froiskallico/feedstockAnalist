@@ -1,4 +1,4 @@
- # %%
+# %%
 from pprint import pprint
 import numpy as np
 import pandas as pd
@@ -282,7 +282,7 @@ class App(object):
                         PCO.PK_PCO OC,
                         CAD.RAZAO_SOCIAL FORNECEDOR,
                         IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0) QTD_PENDENTE_OC,
-                        IPC.ENTREGA,
+                        COALESCE(IPC.DT_FOLLOW, IPC.ENTREGA) AS "ENTREGA",
                         MOE.SIMBOLO,
                         (IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0)) * IPC.VALOR VALOR_TOTAL
 
@@ -304,7 +304,7 @@ class App(object):
                         PCO.PK_PCO OC,
                         CAD.RAZAO_SOCIAL FORNECEDOR,
                         IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0) QTD_PENDENTE_OC,
-                        IPC.ENTREGA,
+                        COALESCE(IPC.DT_FOLLOW, IPC.ENTREGA) AS "ENTREGA",
                         MOE.SIMBOLO,
                         (IPC.QUANTIDADE - COALESCE(IPC.QTD_RECEB, 0) - COALESCE(IPC.QTD_CANC, 0)) * IPC.VALOR VALOR_TOTAL
 
